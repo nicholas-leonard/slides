@@ -6,22 +6,37 @@ class: center, middle
 
 # Agenda
 
-1. Introduction
-2. Deep-dive
-3. ...
+1. Tensors – 5 min
+2. Modules and Criterions – 10 min
+3. Training and Evaluation – 10 min
+4. Convolutional Neural Networks – 10 min
+5. Recurrent Neural Networks – 10 min
+6. Hyper-optimization – 5 min
 
+---
+
+# Tensors
+
+A `3x2` Tensor initialized with random scalars (sometimes NaNs).
 ```lua
-th> a:resize(1,2,3,5)
-(1,1,.,.) = 
-   5.6073e-01   5.7321e-01   7.0750e-01   5.2515e-01   4.3153e-01
-   3.6150e-01   5.8191e-01   7.5288e-01   5.5074e-01   6.6107e-01
-   2.8326e-01   3.3185e-01  3.6769e-317  1.8284e+190  1.2877e+214
-
-(1,2,.,.) = 
-  4.8142e+199  7.1008e+194  1.8991e+132   9.4555e-76  3.2516e+233
-  7.7330e+168  1.3544e+243  4.9517e-114   9.4639e-76   5.0186e-91
-  1.8284e+190  1.8412e+189  3.4621e+198   2.8108e-33  1.1993e+141
-[torch.DoubleTensor of size 1x2x3x5]
+th> a = torch.FloatTensor(3,2)
+th> a -- initialized with garbage content
+ 8.6342e+19  4.5694e-41  8.6342e+19
+ 4.5694e-41  0.0000e+00  0.0000e+00
+[torch.FloatTensor of size 2x3]
 ```
-
+Fill with ones :
+```lua
+th> a:fill(1)
+ 1  1  1
+ 1  1  1
+[torch.FloatTensor of size 2x3]
+```
+Random uniform initialization :
+```
+th> a:uniform(0,1) -- random 
+ 0.6323  0.9232  0.2930
+ 0.8412  0.5131  0.9101
+[torch.FloatTensor of size 2x3]
+```
 ---
