@@ -39,7 +39,7 @@ th> a:fill(1)
 [torch.FloatTensor of size 2x3]
 ```
 Random uniform initialization :
-```
+```lua
 th> a:uniform(0,1) -- random 
  0.6323  0.9232  0.2930
  0.8412  0.5131  0.9101
