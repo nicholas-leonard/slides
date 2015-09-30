@@ -25,21 +25,24 @@ October 8, 2015
 # Introduction 
 
 My background:
- * was a Army Communications and Electronics Officer in the Canadian Forces for 9 years;
- * did my masters in Yoshua Bengio's lab working with Python, Theano and Pylearn2;
- * switched to Torch7 in 2013 to work on distributed conditional computation;
- * currently work in NYC at a deep learning and biometrics startup called Element Inc;
- * passion for elegant, modular, simple and fast deep learning code : Torch7/CUDA;
+ * was an Army Communications and Electronics Officer for 9 years ;
+ * studied in Yoshua Bengio's lab : Python, Theano and Pylearn2 ;
+ * switched to Torch7 in 2013 : needed simple modular fast deep learning framework ;
+ * employed at a deep learning and biometrics startup called Element Inc ;
 
-Why should I take the time to learn Lua :
+Why you should take the time to learn Lua :
  * easy interface between low-level C/CUDA/C++ and high-level Lua ;
- * Lua is light-weight and extremely powerful ;
+ * light-weight and extremely powerful ;
  * Tables can be used as lists, dictionaries, classes and objects ;
  * Tables make it easy to extend existing classes (at any level) ;
- * If you like Python, you will like Lua
+ * If you like Python, you will likely like Lua ;
 
 What's up with Torch7?
- * a scientific computing distribution with an emphasis on deep learning;
+ * a scientific computing distribution with an emphasis on deep learning ;
+ * written in Lua, it has a simple interface to low-level C/CUDA ;
+ * neural network modules make it easy to assemble and train MLPs, CNNs, RNNs, etc. ;
+ * under development since October 2002 ;
+ * used by Facebook, Google [DeepMind], Twitter, NYU, Purdue University, etc.
 
 ---
 
