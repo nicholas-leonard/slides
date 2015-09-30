@@ -1,6 +1,12 @@
 class: center, middle
 
-# Title
+# Torch7: Applied Deep Learning for Vision and Natural Language
+
+Nicholas Leonard
+
+Element Inc.
+
+October 8, 2015
 
 ---
 
