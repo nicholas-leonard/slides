@@ -58,42 +58,45 @@ What's up with Torch 7?
 # Packages
 
 The Torch 7 distribution is made up of different packages, each its own github repository :
- * torch7/cutorch : tensors, BLAS, file I/O (serialization), utilities for unit testing and cmd-line argument parsing ;
- * nn/cunn : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
- * optim : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
- * trepl : torch read–eval–print loop, Lua interpreter, `th>` ;
- * paths : file system manipulation package ;
- * images : for saving, loading, constructing, transforming and displaying images ;
 
-See the torch.ch website for a more complete list of official packages.
+ * _torch7_/_cutorch_ : tensors, BLAS, file I/O (serialization), utilities for unit testing and cmd-line argument parsing ;
+ * _nn/cunn_ : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
+ * _optim_ : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
+ * _trepl_ : torch read–eval–print loop, Lua interpreter, `th>` ;
+ * _paths_ : file system manipulation package ;
+ * _image_ : for saving, loading, constructing, transforming and displaying images ;
+
+Refer to the torch.ch website for a more complete list of official packages.
  
 ---
 
 # Packages
 
 Many more non-official packages out there :
- * dp : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
- * dpnn : extensions to the nn library. REINFORCE algorithm ;
- * nnx/cunnx : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
- * rnn : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
- * moses : utility-belt library for functional programming in Lua, mostly for tables ;
- * threads/parallel : libraries for multi-threading or multi-processing ;
- * async : asynchronous library for Lua, inspired by Node.js ;
+
+ * _dp_ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
+ * _dpnn_ : extensions to the nn library. REINFORCE algorithm ;
+ * _nnx_/_cunnx_ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
+ * _rnn_ : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
+ * _moses_ : utility-belt library for functional programming in Lua, mostly for tables ;
+ * _threads_/_parallel_ : libraries for multi-threading or multi-processing ;
+ * _async_ : asynchronous library for Lua, inspired by Node.js ;
 
 ---
 
 # Tensors
 
 Tensors are the main class of objects used in Torch 7 :
+
  * An N-dimensional array that views an underlying `Storage` (a contiguous 1D-array);
  * Different Tensors can share the same `Storage`;
- * Different types : `FloatTensor`, `DoubleTensor`, `IntTensor`, `CudaTensor` ;
+ * Different types : `FloatTensor`, `DoubleTensor`, `IntTensor`, `CudaTensor`, and so on ;
  * Implements most Basic Linear Algebra Sub-routines (BLAS) : 
    * `torch.addmm` : matrix-matrix multiplication ;
    * `torch.addmv` : matrix-vector multiplication ;
    * `torch.addr` :  outer-product between vectors ;
    * etc.  
- * More goodies : random initialization, indexing, transposition, sub-tensor extractions ;
+ * Supports random initialization, indexing, transposition, sub-tensor extractions, and more ;
  * Most operations for Float/Double are also implemented for Cuda Tensors (via cutorch) ;
 
 ---
@@ -332,11 +335,51 @@ They also have `forward`/`backward` methods :
 Modules and Criterions implement a differentiable equation that results in a scalar `loss`.
 For Stochastic Gradient Descent (SGD), the loss is minimized by obtaining
 the gradients w.r.t. the learnable parameters of the modules, 
-and moving the parameters in the opposite direction of these gradients. 
-These parameter updates are scaled by a small learning rate `lr`, usually between `0.1 and 0.0001`. 
+and moving (updating) the parameters in the opposite direction of these gradients. 
+These parameter updates are scaled by a small learning rate `lr`, typically between `0.1 and 0.0001`. 
 
 Stochastic gradient descent is the most common training algorithm. 
-It can be augmented with momentum, which involves 
+It can be augmented with momentum, which involves keeping an exponential moving average of the gradients w.r.t. parameters.
+The _dpnn_ package implements this via the `module:updateGradParameters(momentum)`.
+
+---
+
+# Modules and Criterions - simple MLP
+
+Let's build classifier using multi-layer perceptron (MLP) with 2 layers of hidden units using 
+a hyperbolic tangent non-linearity. First, define some hyper-parameters :
+
+```lua
+batchSize = 32
+inputSize = 20
+outputSize = 10 -- number of output classes
+hiddenSize = 30
+```
+
+Then build the `mlp` module :
+
+```lua
+mlp = nn.Sequential()
+mlp:add(nn.Linear(inputSize, hiddenSize))
+mlp:add(nn.Tanh()) -- hyperbolic tangent non-linearity
+mlp:add(nn.Linear(hiddenSize, hiddenSize))
+mlp:add(nn.Tanh()) 
+mlp:add(nn.Linear(hiddenSize, outputSize))
+mlp:add(nn.LogSoftMax()) -- for classification problems
+```
+
+A classifier with a `LogSoftMax` output can be used with a Negative Log-Likelihood (NLL) Criterion :
+
+```lua
+nll = nn.ClassNLLCriterion()
+```
+
+---
+
+# Modules and Criterions - simple MLP
 
 
+
+
+---
 
