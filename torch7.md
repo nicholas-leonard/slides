@@ -91,20 +91,21 @@ Tensors are the main class of objects used in Torch 7 :
  * Implements most Basic Linear Algebra Sub-routines (BLAS) : 
    * `torch.addmm` : matrix-matrix multiplication ;
    * `torch.addmv` : matrix-vector multiplication ;
-   * `torch.addr` :  outer-product between vecators ;
+   * `torch.addr` :  outer-product between vectors ;
    * etc.  
  * More goodies : random initialization, indexing, transposition, sub-tensor extractions ;
  * Most operations for Float/Double are also implemented for Cuda Tensors (via cutorch) ;
 
 ---
 
-# Tensors - Example
+# Tensors - Initialization
 
-A `3x2` Tensor initialized with random scalars (sometimes NaNs) :
+A `3x2` Tensor  :
 
 ```lua
 th> a = torch.FloatTensor(3,2)
-th> a -- initialized with garbage content
+-- initialized with garbage content (whatever was already there)
+th> a 
  8.6342e+19  4.5694e-41  8.6342e+19
  4.5694e-41  0.0000e+00  0.0000e+00
 [torch.FloatTensor of size 2x3]
@@ -122,7 +123,7 @@ th> a:fill(1)
 Random uniform initialization :
 
 ```lua
-th> a:uniform(0,1) -- random 
+th> a:uniform(0,1) -- random uniform between 0 and 1
  0.6323  0.9232  0.2930
  0.8412  0.5131  0.9101
 [torch.FloatTensor of size 2x3]
@@ -130,7 +131,53 @@ th> a:uniform(0,1) -- random
 
 ---
 
-# Tensors
+# Tensors - Transformation
+
+We can transpose any pair of dimensions in a Tensor :
+
+```lua
+th> b = a:transpose(1,2)
+```
+
+Tensor `a` and `b` share the same underlying storage (look at the `1.0000` in both):
+
+```lua
+th> b[{1,2}] = 1
+th> b
+ 0.6323  1.0000
+ 0.9232  0.5131
+ 0.2930  0.9101
+[torch.FloatTensor of size 3x2]
+
+th> a
+ 0.6323  0.9232  0.2930
+ 1.0000  0.5131  0.9101
+[torch.FloatTensor of size 2x3]
+```
+
+This is what the storage looks like :
+
+```lua
+th> a:storage()
+
+ 0.6323
+ 0.9232
+ 0.2930
+ 1.0000
+ 0.5131
+ 0.9101
+[torch.FloatStorage of size 6]
+```
+
+Yet `a` and `b` have different strides :
+
+```lua
+th> unpack(a:stride():totable())
+3	1
+
+th> unpack(b:stride():totable())
+1  3
+```
 
 ---
 
