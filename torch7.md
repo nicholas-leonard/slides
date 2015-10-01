@@ -269,7 +269,7 @@ Tensors `d` and `e` have different storages after the resize.
 
 # Tensors - BLAS
 
-![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)
+.right[![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)]
 
 Tensors are all about basic linear algebra. 
 Let's multiply an `input` and a `weight` matrix into an `output` matrix :
