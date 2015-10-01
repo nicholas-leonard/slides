@@ -281,7 +281,7 @@ th> output = torch.FloatTensor()
 th> output:addmm(0, self.output, 1, input, weight:t())
 ```
 
-![mmm](matrixmul.png)
+![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)
 
 ---
 
