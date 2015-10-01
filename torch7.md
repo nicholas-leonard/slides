@@ -13,32 +13,41 @@ October 8, 2015
 # Agenda
 
 1. Introduction - 5 min
-2. Tensors – 5 min
-3. Modules and Criterions – 10 min
-4. Training and Evaluation – 10 min
+2. Packages - 5 min
+2. torch7 : Tensors and BLAS – 5 min
+3. nn : Modules and Criterions – 10 min
+4. dp : Training and Evaluation – 10 min
 5. Convolutional Neural Networks – 10 min
 6. Recurrent Neural Networks – 10 min
 7. Hyper-optimization – 5 min
 
 ---
 
-# Introduction 
+# Introduction
 
 My background:
  * was an Army Communications and Electronics Officer for 9 years ;
  * studied in Yoshua Bengio's lab : Python, Theano and Pylearn2 ;
  * switched to Torch7 in 2013 : needed simple modular fast deep learning framework ;
  * employed at a deep learning and biometrics startup called Element Inc ;
+ 
+---
 
-Why you should take the time to learn Lua :
+# Introduction - Lua
+
+Why you should take the time to learn Lua?
  * easy interface between low-level C/CUDA/C++ and high-level Lua ;
  * light-weight and extremely powerful ;
  * Tables can be used as lists, dictionaries, classes and objects ;
  * Tables make it easy to extend existing classes (at any level) ;
  * If you like Python, you will likely like Lua ;
+ 
+---
 
-What's up with Torch7?
- * a scientific computing distribution with an emphasis on deep learning ;
+# Introduction - Torch 7
+
+What's up with Torch 7?
+ * a scientific computing *distribution* with an emphasis on deep learning ;
  * written in Lua, it has a simple interface to low-level C/CUDA ;
  * neural network modules make it easy to assemble and train MLPs, CNNs, RNNs, etc. ;
  * under development since October 2002 ;
@@ -46,7 +55,50 @@ What's up with Torch7?
 
 ---
 
+# Packages
+
+The Torch 7 distribution is made up of different packages, each its own github repository :
+ * torch7/cutorch : tensors, BLAS, file I/O (serialization), utilities for unit testing and cmd-line argument parsing ;
+ * nn/cunn : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
+ * optim : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
+ * trepl : torch read–eval–print loop, Lua interpreter, `th>` ;
+ * paths : file system manipulation package ;
+ * images : for saving, loading, constructing, transforming and displaying images ;
+
+See the torch.ch website for a more complete list of official packages.
+ 
+---
+
+# Packages
+
+Many more non-official packages out there :
+ * dp : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
+ * dpnn : extensions to the nn library. REINFORCE algorithm ;
+ * nnx/cunnx : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
+ * rnn : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
+ * moses : utility-belt library for functional programming in Lua, mostly for tables ;
+ * threads/parallel : libraries for multi-threading or multi-processing ;
+ * async : asynchronous library for Lua, inspired by Node.js ;
+
+---
+
 # Tensors
+
+Tensors are the main class of objects used in Torch 7 :
+ * An N-dimensional array that views an underlying `Storage` (a contiguous 1D-array);
+ * Different Tensors can share the same `Storage`;
+ * Different types : `FloatTensor`, `DoubleTensor`, `IntTensor`, `CudaTensor` ;
+ * Implements most Basic Linear Algebra Sub-routines (BLAS) : 
+   * `torch.addmm` : matrix-matrix multiplication ;
+   * `torch.addmv` : matrix-vector multiplication ;
+   * `torch.addr` :  outer-product between vecators ;
+   * etc.  
+ * More goodies : random initialization, indexing, transposition, sub-tensor extractions ;
+ * Most operations for Float/Double are also implemented for Cuda Tensors (via cutorch) ;
+
+---
+
+# Tensors - Example
 
 A `3x2` Tensor initialized with random scalars (sometimes NaNs) :
 
@@ -81,3 +133,7 @@ th> a:uniform(0,1) -- random
 # Tensors
 
 ---
+
+# nn
+
+
