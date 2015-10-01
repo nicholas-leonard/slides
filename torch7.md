@@ -131,9 +131,9 @@ th> a:uniform(0,1) -- random uniform between 0 and 1
 
 ---
 
-# Tensors - Transformation
+# Tensors - Transpose
 
-We can transpose any pair of dimensions in a Tensor :
+Let's create a new Tensor `b`, the transpose of dimensions `1` and `2` of Tensor `a` :
 
 ```lua
 th> b = a:transpose(1,2)
@@ -154,6 +154,10 @@ th> a
  1.0000  0.5131  0.9101
 [torch.FloatTensor of size 2x3]
 ```
+
+---
+
+# Tensors - Storage
 
 This is what the storage looks like :
 
@@ -180,6 +184,59 @@ th> unpack(b:stride():totable())
 ```
 
 ---
+
+# Tensor - Contiguous
+
+Are `a` and `b` contiguous?
+
+```lua
+th> a:isContiguous(), b:isContiguous()
+true false
+```
+
+Tensor `b` isn't. This means that the elements in the last dimension (the row) aren't contiguous in memory :
+
+```lua
+th> b[{1,1}], b[{1,2}], b[{2,1}] -- etc
+0.63226145505905	1	0.92315602302551	
+
+th> b:storage()
+ 0.6323 -- 1,1
+ 0.9232 -- 2,1
+ 0.2930
+ 1.0000 -- 1,2
+ 0.5131
+ 0.9101
+[torch.FloatStorage of size 6]
+```
+
+We can make it contiguous by cloning it :
+
+```lua
+th> c = b:clone()
+th> c:isContiguous()
+true
+```
+
+or by copying it :
+
+```lua
+th> d = b.new():resize(b:size()):copy(b)
+th> d:isContiguous()
+true
+```
+
+---
+
+# Tensors - BLAS
+
+---
+
+# Tensors - CUDA
+
+---
+
+
 
 # nn
 
