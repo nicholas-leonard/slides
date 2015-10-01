@@ -269,6 +269,8 @@ Tensors `d` and `e` have different storages after the resize.
 
 # Tensors - BLAS
 
+![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)
+
 Tensors are all about basic linear algebra. 
 Let's multiply an `input` and a `weight` matrix into an `output` matrix :
 
@@ -280,9 +282,6 @@ th> output = torch.FloatTensor()
 -- matrix matrix multiply :
 th> output:addmm(0, self.output, 1, input, weight:t())
 ```
----
-
-![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)
 
 ---
 
