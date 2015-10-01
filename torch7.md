@@ -177,7 +177,7 @@ Yet `a` and `b` have different strides :
 
 ```lua
 th> unpack(a:stride():totable())
-3	1
+3  1
 
 th> unpack(b:stride():totable())
 1  3
@@ -197,7 +197,7 @@ true false
 Tensor `b` isn't. This means that the elements in the last dimension (the row) aren't contiguous in memory :
 
 ```lua
-th> b[{1,1}], b[{1,2}], b[{2,1}] -- etc
+th> b[{1,1}], b[{1,2}], b[{2,1}]
 0.63226145505905	1	0.92315602302551	
 
 th> b:storage()
@@ -210,6 +210,10 @@ th> b:storage()
 [torch.FloatStorage of size 6]
 ```
 
+---
+
+# Tensors - Clone/Copy
+
 We can make it contiguous by cloning it :
 
 ```lua
@@ -221,10 +225,45 @@ true
 or by copying it :
 
 ```lua
-th> d = b.new():resize(b:size()):copy(b)
+th> d = b.new()
+th> d:resize(b:size())
+th> d:copy(b)
 th> d:isContiguous()
 true
 ```
+
+Note : `clone()` allocates memory. `copy()` doesn't. `resize()` sometimes does. 
+Above it does because `b.new()` intializes an empty Tensor. 
+
+---
+
+# Tensors - Resize
+
+Calling `resize()` again doesn't allocate new memory (it already has the right size) :
+
+```lua
+th> d:resize(b:size())
+th> d:storage():size()
+6
+```
+
+An neither would resizing it to a smaller size :
+
+```lua
+th> d:resize(3)
+th> d:storage():size()
+6
+```
+
+But resizing to a greater size will allocate new memory :
+
+```lua
+th> e = torch.FloatTensor(d):resize(3,3)
+th> e:storage():size() == d:storage():size()
+false
+```
+Tensors `d` and `e` have different storages after the resize.
+
 
 ---
 
