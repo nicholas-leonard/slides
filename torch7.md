@@ -105,7 +105,7 @@ Tensors are the main class of objects used in Torch 7 :
 
 A `3x2` Tensor  :
 
-```lua
+```javascript
 th> a = torch.FloatTensor(3,2)
 -- initialized with garbage content (whatever was already there)
 th> a 
@@ -116,7 +116,7 @@ th> a
 
 Fill with ones :
 
-```lua
+```javascript
 th> a:fill(1)
  1  1  1
  1  1  1
@@ -125,7 +125,7 @@ th> a:fill(1)
 
 Random uniform initialization :
 
-```lua
+```javascript
 th> a:uniform(0,1) -- random uniform between 0 and 1
  0.6323  0.9232  0.2930
  0.8412  0.5131  0.9101
@@ -138,13 +138,13 @@ th> a:uniform(0,1) -- random uniform between 0 and 1
 
 Let's create a new Tensor `b`, the transpose of dimensions `1` and `2` of Tensor `a` :
 
-```lua
+```javascript
 th> b = a:transpose(1,2)
 ```
 
 Tensor `a` and `b` share the same underlying storage (look at the `1.0000` in both):
 
-```lua
+```javascript
 th> b[{1,2}] = 1
 th> b
  0.6323  1.0000
@@ -164,7 +164,7 @@ th> a
 
 This is what the storage looks like :
 
-```lua
+```javascript
 th> a:storage()
 
  0.6323
@@ -178,7 +178,7 @@ th> a:storage()
 
 Yet `a` and `b` have different strides :
 
-```lua
+```javascript
 th> unpack(a:stride():totable())
 3  1
 
@@ -192,14 +192,14 @@ th> unpack(b:stride():totable())
 
 Are `a` and `b` contiguous?
 
-```lua
+```javascript
 th> a:isContiguous(), b:isContiguous()
 true false
 ```
 
 Tensor `b` isn't. This means that the elements in the last dimension (the row) aren't contiguous in memory :
 
-```lua
+```javascript
 th> b[{1,1}], b[{1,2}], b[{2,1}]
 0.63226145505905	1	0.92315602302551	
 
@@ -219,7 +219,7 @@ th> b:storage()
 
 We can make it contiguous by cloning it :
 
-```lua
+```javascript
 th> c = b:clone()
 th> c:isContiguous()
 true
@@ -227,7 +227,7 @@ true
 
 or by copying it :
 
-```lua
+```javascript
 th> d = b.new()
 th> d:resize(b:size())
 th> d:copy(b)
@@ -244,7 +244,7 @@ Above it does because `b.new()` intializes an empty Tensor.
 
 Calling `resize()` again doesn't allocate new memory (it already has the right size) :
 
-```lua
+```javascript
 th> d:resize(b:size())
 th> d:storage():size()
 6
@@ -252,7 +252,7 @@ th> d:storage():size()
 
 An neither would resizing it to a smaller size :
 
-```lua
+```javascript
 th> d:resize(3)
 th> d:storage():size()
 6
@@ -260,7 +260,7 @@ th> d:storage():size()
 
 But resizing to a greater size will allocate new memory :
 
-```lua
+```javascript
 th> e = torch.FloatTensor(d):resize(3,3)
 th> e:storage():size() == d:storage():size()
 false
@@ -277,7 +277,7 @@ Tensors `d` and `e` have different storages after the resize.
 Tensors are all about basic linear algebra. 
 Let's multiply an `input` and a `weight` matrix into an `output` matrix :
 
-```lua
+```javascript
 th> batchSize, inputSize, outputSize = 4, 2, 3
 th> input = torch.FloatTensor(batchSize, inputSize):uniform(0,1)
 th> weight = torch.FloatTensor(outputSize, inputSize):unfirom(0,1)
@@ -295,7 +295,7 @@ This is a common operation used by the popular `nn.Linear` module.
 
 Let's what the difference is for doing the previous matrix-matrix multiply using CUDA :
 
-```lua
+```javascript
 require 'cutorch'
 th> input = torch.CudaTensor(batchSize, inputSize):uniform(0,1)
 th> weight = torch.CudaTensor(outputSize, inputSize):unfirom(0,1)
@@ -349,7 +349,7 @@ The _dpnn_ package implements this via the `module:updateGradParameters(momentum
 Let's build classifier using multi-layer perceptron (MLP) with 2 layers of hidden units using 
 a hyperbolic tangent non-linearity. First, define some hyper-parameters :
 
-```lua
+```javascript
 batchSize = 32
 inputSize = 20
 outputSize = 10 -- number of output classes
@@ -358,7 +358,7 @@ hiddenSize = 30
 
 Then build the `mlp` module :
 
-```lua
+```javascript
 mlp = nn.Sequential()
 mlp:add(nn.Linear(inputSize, hiddenSize))
 mlp:add(nn.Tanh()) -- hyperbolic tangent non-linearity
@@ -370,7 +370,7 @@ mlp:add(nn.LogSoftMax()) -- for classification problems
 
 A classifier with a `LogSoftMax` output can be used with a Negative Log-Likelihood (NLL) Criterion :
 
-```lua
+```javascript
 nll = nn.ClassNLLCriterion()
 ```
 
