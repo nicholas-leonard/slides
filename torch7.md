@@ -269,7 +269,7 @@ Tensors `d` and `e` have different storages after the resize.
 
 # Tensors - BLAS
 
-.right[![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)]
+![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)
 
 Tensors are all about basic linear algebra. 
 Let's multiply an `input` and a `weight` matrix into an `output` matrix :
@@ -283,14 +283,60 @@ th> output = torch.FloatTensor()
 th> output:addmm(0, self.output, 1, input, weight:t())
 ```
 
+`output` will be automatically resized to `batchSize x outputSize`.
+This is a common operation used by the popular `nn.Linear` module.
+
 ---
 
 # Tensors - CUDA
 
+Let's what the difference is for doing the previous matrix-matrix multiply using CUDA :
+
+```lua
+require 'cutorch'
+th> input = torch.CudaTensor(batchSize, inputSize):uniform(0,1)
+th> weight = torch.CudaTensor(outputSize, inputSize):unfirom(0,1)
+th> output = torch.CudaTensor()
+-- matrix matrix multiply :
+th> output:addmm(0, self.output, 1, input, weight:t())
+```
+
+So basically, no difference except for use of `torch.CudaTensor`.
+However, it will be much faster on GPU than CPU for larger Tensors.
+This is especially true for high-end cards like NVIDIA Titan X and such.
+
 ---
 
+# Modules and Criterions
 
+The _nn_ package uses `nn.Modules` and `nn.Criterions` for implementing modular backpropagation. 
+Backpropagation is gradient descent using the chain rule.
+ 
+Modules are links in the gradient descent chain. 
+Essentially, backpropagation (learning) can be implemented with 3 methods :
+ 
+ * `[output] module:forward(input)` : calls `updateOutput`. Transforms `input` into `output`.
+ * `[gradInput] module:backward(input, gradOutput [, scale])` : calls `updateGradInput` followed by `accGradParameters`.  Transforms `gradOutputs` into `gradInputs` and accumulates gradients w.r.t. parameters.
+ * `module:updateParametes(lr)` : updates the parameters using the gradients w.r.t. parameters: `param = param - lr*gradParam`. 
+ 
+Criterions measure the `loss` of a neural network (a graph of modules).
+They also have `forward`/`backward` methods :
 
-# nn
+ * `[loss] criterion:forward(input, target)` : measures `loss` (a scalar) given `input` (output of the neural network) and `target` (supervised learning) ;
+ * `[gradInput] criterion:backward(input, target)` : generates `gradInput` : gradient of `loss` w.r.t. to `input` ;
+
+---
+
+# Modules and Criterions - SGD
+
+Modules and Criterions implement a differentiable equation that results in a scalar `loss`.
+For Stochastic Gradient Descent (SGD), the loss is minimized by obtaining
+the gradients w.r.t. the learnable parameters of the modules, 
+and moving the parameters in the opposite direction of these gradients. 
+These parameter updates are scaled by a small learning rate `lr`, usually between `0.1 and 0.0001`. 
+
+Stochastic gradient descent is the most common training algorithm. 
+It can be augmented with momentum, which involves 
+
 
 
