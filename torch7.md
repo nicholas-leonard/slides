@@ -14,9 +14,9 @@ October 8, 2015
 
 1. Introduction - 5 min
 2. Packages - 5 min
-2. torch7 : Tensors and BLAS – 5 min
-3. nn : Modules and Criterions – 10 min
-4. dp : Training and Evaluation – 10 min
+2. Tensors – 10 min
+3. Modules and Criterions – 10 min
+4. Training and Evaluation – 10 min
 5. Convolutional Neural Networks – 10 min
 6. Recurrent Neural Networks – 10 min
 7. Hyper-optimization – 5 min
@@ -232,7 +232,7 @@ th> d:isContiguous()
 true
 ```
 
-Note : `clone()` allocates memory. `copy()` doesn't. `resize()` sometimes does. 
+Note : `clone()` allocates memory, while `copy()` doesn't. However, `resize()` sometimes does. 
 Above it does because `b.new()` intializes an empty Tensor. 
 
 ---
@@ -268,6 +268,20 @@ Tensors `d` and `e` have different storages after the resize.
 ---
 
 # Tensors - BLAS
+
+Tensors are all about basic linear algebra. 
+Let's multiply an `input` and a `weight` matrix into an `output` matrix :
+
+```lua
+th> batchSize, inputSize, outputSize = 4, 2, 3
+th> input = torch.FloatTensor(batchSize, inputSize):uniform(0,1)
+th> weight = torch.FloatTensor(outputSize, inputSize):unfirom(0,1)
+th> output = torch.FloatTensor()
+-- matrix matrix multiply :
+th> output:addmm(0, self.output, 1, input, weight:t())
+```
+
+![mmm](https://en.wikipedia.org/wiki/Matrix_multiplication#/media/File:Matrix_multiplication_diagram_2.svg)
 
 ---
 
