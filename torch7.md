@@ -400,8 +400,6 @@ end
 
 ---
 
-background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
-
 # Deep Learning
 
 What is deep learning?
@@ -421,12 +419,16 @@ What is deep learning?
  * technological improvements :
   * massively parallel processing : GPUs, CUDA ;
   * fast libraries : torch, cudnn, cuda-convnet, theano ;
- 
-Let's start with a multi-layer perceptron...
 
 ---
 
-# Multi-Layer Perceptron - MNIST dataset
+background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
+
+# Deep Learning - Summary 
+
+---
+
+# Deep Learning - MNIST dataset
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mnist.png)]
 
@@ -450,7 +452,7 @@ validTargets = ds:get('valid', 'targets', 'b')
 
 ---
 
-# Multi-Layer Perceptron - Module and Criterion
+# Multi-Layer Perceptron
 
 An MLP with 2 layers of hidden units :
 
