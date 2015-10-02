@@ -400,9 +400,9 @@ end
 
 ---
 
-# Deep Learning
-
 background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
+
+# Deep Learning
 
 What is deep learning?
  
