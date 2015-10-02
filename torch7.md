@@ -346,11 +346,13 @@ nn.Sequential {
 }
 ```
 
-A binary cross-entropy `Criterion` expects 0 or 1 valued targets:
+A binary cross-entropy `Criterion` which expects 0 or 1 valued targets:
 
 ```lua
 bce = nn.BCECriterion()
 ```
+
+_.center(![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce.png)]
 
 ---
 
@@ -367,6 +369,7 @@ Stochastic gradient descent (SGD) :
 
 ```lua
 for i=1,100 do
+   -- sample
    local idx = math.random(1,inputs:size(1))
    local input, target = inputs[idx], targets[idx]
    -- forward
@@ -379,8 +382,6 @@ for i=1,100 do
    lreg:updateParameters(0.1)
 end
 ```
-
-Forward, backward, update, forward, backward, update, ...
 
 ---
 
