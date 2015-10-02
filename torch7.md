@@ -375,7 +375,6 @@ Function for one epoch of stochastic gradient descent (SGD)
 require 'dpnn'
 function trainEpoch(module, criterion, inputs, targets)
    for i=1,inputs:size(1) do
-      -- sample
       local idx = math.random(1,inputs:size(1))
       local input, target = inputs[idx], targets:narrow(1,idx,1)
       -- forward
@@ -401,11 +400,23 @@ end
 
 ---
 
+# Multi-Layer Perceptron
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)]
+
+What is deep learning?
+ 
+ * collection of techniques to improve the optimization and generalization of neural networks ;
+ * stacking layers of transformations to create successively more abstract levels of representations ;
+ 
+
+---
+
 # Multi-Layer Perceptron - MNIST dataset
 
-__dp__ makes it easy to get MNIST dataset :
-
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mnist.png)]
+
+__dp__ makes it easy to obtain the MNIST dataset :
 
 ```lua
 require 'dp'
@@ -421,7 +432,7 @@ validInputs = ds:get('valid', 'inputs', 'bchw')
 validTargets = ds:get('valid', 'targets', 'b')
 ```
 
-BCHW : batch, color, height, width
+*bchw* specifies axis order : `batch x color x height x width`
 
 ---
 
