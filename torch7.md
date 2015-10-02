@@ -372,6 +372,7 @@ targets = torch.Tensor(10):random(0,1)
 Function for one epoch of stochastic gradient descent (SGD)
 
 ```lua
+require 'dpnn'
 function trainEpoch(module, criterion, inputs, targets)
    for i=1,inputs:size(1) do
       -- sample
@@ -384,7 +385,8 @@ function trainEpoch(module, criterion, inputs, targets)
       local gradOutput = criterion:backward(output, target)
       local gradInput = module:backward(input, gradOutput)
       -- update
-      module:updateParameters(0.1)
+      module:updateGradParameters(0.9) -- momentum (dpnn)
+      module:updateParameters(0.1) -- learning rate
    end
 end
 ```
@@ -399,19 +401,31 @@ end
 
 ---
 
-# Multi-Layer Perceptron
+# Multi-Layer Perceptron - MNIST dataset
 
-__dp__ provides the MNIST dataset :
+__dp__ makes it easy to get MNIST dataset :
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mnist.png)]
+
 ```lua
 require 'dp'
 ds = dp.Mnist()
--- train set
+```
+
+Training and validation set inputs and targets :
+
+```lua
 trainInputs = ds:get('train', 'inputs', 'bchw')
 trainTargets = ds:get('train', 'targets', 'b')
--- validation set
 validInputs = ds:get('valid', 'inputs', 'bchw')
 validTargets = ds:get('valid', 'targets', 'b')
 ```
+
+BCHW : batch, color, height, width
+
+---
+
+# Multi-Layer Perceptron - Module and Criterion
 
 An MLP with 2 layers of hidden units :
 
@@ -454,7 +468,25 @@ function classEval(module, inputs, targets)
 end
 ```
 
-Using the same `trainEpoch` function, lets 
+Early-stopping on the validation set :
+
+```lua
+bestAccuracy, bestEpoch = 0, 0
+wait = 0
+for epoch=1,300 do
+   trainEpoch(module, criterion, trainInputs, trainTargets)
+   local validAccuracy = classEval(module, validInputs, validTargets)
+   if validAccuracy > bestAccuracy then
+      bestAccuracy, bestEpoch = validAccuracy, epoch
+      torch.save("/path/to/saved/model.t7", module)
+      print(string.format("New maxima : %f @ %f", bestAccuracy, bestEpoch))
+      wait = 0
+   else
+      wait = wait + 1
+      if wait > 30 then break end
+   end
+end
+```
 
 
 ---
