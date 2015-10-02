@@ -325,7 +325,7 @@ Two abstract classes :
  
 ---
  
-# Neural Network - Logistic Regression
+# Logistic Regression - Module
 
 A binary logisitic regressor `Module` with 2 input units and 1 output.
 
@@ -335,7 +335,15 @@ lreg:add(nn.Linear(2, 1))
 lreg:add(nn.Sigmoid())
 ```
 
-You can print modules :
+The above implements :
+
+_.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/logreg.png)]
+
+where the sigmoid (logistic function) is defined as :
+
+_.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/sigmoid.png)]
+
+Also, we can print modules :
 
 ```lua
 th> print(lreg)
@@ -346,17 +354,21 @@ nn.Sequential {
 }
 ```
 
+---
+
+# Logistic Regression - Criterion
+
 A binary cross-entropy `Criterion` which expects 0 or 1 valued targets:
 
 ```lua
 bce = nn.BCECriterion()
 ```
 
-_.center(![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce.png)]
+_.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce.png)]
 
 ---
 
-# Neural Network - Logistic Regression
+# Logistic Regression - Training
 
 Some random dummy dataset with 10 samples:
 
