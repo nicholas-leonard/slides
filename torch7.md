@@ -272,7 +272,7 @@ Tensors `d` and `e` have different storages after the resize.
 
 # Tensors - BLAS
 
-![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)
+.center[![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)]
 
 Tensors are all about basic linear algebra. 
 Let's multiply an `input` and a `weight` matrix into an `output` matrix :
@@ -333,6 +333,17 @@ A binary logisitic regressor `Module` with 2 input units and 1 output.
 lreg = nn.Sequential()
 lreg:add(nn.Linear(2, 1))
 lreg:add(nn.Sigmoid())
+print(lreg)
+```
+
+You can print modules :
+```lua
+
+nn.Sequential {
+  [input -> (1) -> (2) -> output]
+  (1): nn.Linear(2 -> 1)
+  (2): nn.Sigmoid
+}
 ```
 
 A binary cross-entropy `Criterion` expects 0 or 1 valued targets:
@@ -344,8 +355,6 @@ bce = nn.BCECriterion()
 ---
 
 # Neural Network - Logistic Regression
-
-```
 
 Some random dummy dataset with 10 samples:
 
