@@ -1,6 +1,6 @@
 class: center, middle
 
-# Torch7: Applied Deep Learning for Vision and Natural Language
+# Torch 7: Applied Deep Learning for Vision and Natural Language
 
 Nicholas Leonard
 
@@ -15,10 +15,11 @@ October 8, 2015
 1. Introduction - 5 min
 2. Packages - 5 min
 2. Tensors – 10 min
-3. Neural Network – 10 min
-4. Training and Evaluation – 10 min
-5. Convolutional Neural Networks – 10 min
-6. Recurrent Neural Networks – 10 min
+3. Logistic Regression – 5 min
+4. Deep Learning - 2 min
+5. Multi-Layer Perceptron- 5 min
+5. Convolutional Neural Network – 10 min
+6. Recurrent Neural Network – 10 min
 7. Hyper-optimization – 5 min
 
 ---
@@ -26,32 +27,68 @@ October 8, 2015
 # Introduction
 
 My background:
- * was an Army Communications and Electronics Officer for 9 years ;
- * studied in Yoshua Bengio's lab : Python, Theano and Pylearn2 ;
- * switched to Torch7 in 2013 : needed simple modular fast deep learning framework ;
- * employed at a deep learning and biometrics startup called Element Inc ;
- 
+
+ * 2003-2008 : Bacc. Degree in Computer Science at Royal Military College of Canada ;
+ * 2008-2012 : Army Signals Officer : management (office politics, emails), no code, no science ;
+ * 2012-2014 : Master's Degree in Deep Learning at University of Montreal ;
+  * LISA/MILA lab ;
+  * Yoshua Bengio and Aaron Courville as co-directors ;
+  * 2012-2013 : Python, Theano and Pylearn2 ;
+  * 2013-today : Lua, Torch7 ;
+ * 2014-today : employed at Element Inc. :
+  * biometrics startup ;
+  * deep learning on smart phones (Android, iOS) ;
+  * open source contributions (Torch7).
+  
 ---
 
 # Introduction - Lua
 
-Why you should take the time to learn Lua?
+Why take the time to learn Lua :
+
  * easy interface between low-level C/CUDA/C++ and high-level Lua ;
- * light-weight and extremely powerful ;
- * Tables can be used as lists, dictionaries, classes and objects ;
- * Tables make it easy to extend existing classes (at any level) ;
- * If you like Python, you will likely like Lua ;
- 
+ * light-weight : used for embedded systems ;
+ * tables :
+   * can be used as lists, dictionaries, classes and objects ;
+   * make it easy to extend existing classes (at any level) ;
+ * fast for-loops (LuaJIT) ;
+ * closures ;
+
+Example : 
+
+```lua
+a = {1,2,a=3, print=function(self) print(self) end}
+a:print() -- i.e. a.print(a)
+```
+
+Output :
+
+```lua
+{
+  1 : 1
+  2 : 2
+  print : function: 0x417f11e0
+  a : 3
+}
+```
+
 ---
 
 # Introduction - Torch 7
 
 What's up with Torch 7?
- * a scientific computing *distribution* with an emphasis on deep learning ;
- * written in Lua, it has a simple interface to low-level C/CUDA ;
- * neural network modules make it easy to assemble and train MLPs, CNNs, RNNs, etc. ;
- * under development since October 2002 ;
- * used by Facebook, Google [DeepMind], Twitter, NYU, Purdue University, etc.
+
+  * a powerful N-dimensional array ;
+  * lots of routines for indexing, slicing, transposing, ... ;
+  * amazing interface to C, via LuaJIT ;
+  * linear algebra routines ;
+  * easy modular neural networks ;
+  * numeric optimization routines ;
+  * fast and efficient GPU support ;
+  * embeddable, with ports to iOS, Android and FPGA backends ;
+  * under development since October 2002 ;
+  * used by Facebook, Google [DeepMind], Twitter, NYU, ...
+
 
 ---
 
@@ -452,7 +489,20 @@ validTargets = ds:get('valid', 'targets', 'b')
 
 ---
 
-# Multi-Layer Perceptron
+# Multi-Layer Perceptron 
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mlp.png)]
+
+An MLP is a stack of parameterized non-linear layers :
+
+ * each layer is an affine transform (`Linear`) followed by a transfer function (`Tanh`, `ReLU`, `SoftMax`) ;
+ * parameters (`weight`, `bias`) are found in the `Linear` module ;
+ * transfer functions help to model complex relationships between input and output (non-linear);
+ * parameters are varied to fit the data ;
+
+---
+
+# Multi-Layer Perceptron - Module and Criterion
 
 An MLP with 2 layers of hidden units :
 
@@ -475,7 +525,7 @@ criterion = nn.ClassNLLCriterion()
 
 ---
 
-# Multi-Layer Perceptron - Early Stopping
+# Multi-Layer Perceptron - Cross-validation
 
 A function to evaluate performance on the validation set :
 
@@ -494,6 +544,10 @@ function classEval(module, inputs, targets)
    return cm.totalValids
 end
 ```
+
+---
+
+# Multi-Layer Perceptron - Early-Stopping
 
 Early-stopping on the validation set :
 
@@ -515,6 +569,18 @@ for epoch=1,300 do
 end
 ```
 
+Early-stops when no new maxima has been found for 30 consecutive epochs.
 
 ---
+
+# Convolutional Neural Network
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/convnet.png)]
+
+---
+
+# Recurrent Neural Network
+
+---
+
 
