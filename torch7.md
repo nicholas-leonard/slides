@@ -333,12 +333,12 @@ A binary logisitic regressor `Module` with 2 input units and 1 output.
 lreg = nn.Sequential()
 lreg:add(nn.Linear(2, 1))
 lreg:add(nn.Sigmoid())
-print(lreg)
 ```
 
 You can print modules :
-```lua
 
+```lua
+th> print(lreg)
 nn.Sequential {
   [input -> (1) -> (2) -> output]
   (1): nn.Linear(2 -> 1)
@@ -366,7 +366,6 @@ targets = torch.Tensor(10):random(0,1)
 Stochastic gradient descent (SGD) :
 
 ```lua
--- 
 for i=1,100 do
    local idx = math.random(1,inputs:size(1))
    local input, target = inputs[idx], targets[idx]
