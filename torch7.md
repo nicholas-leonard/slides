@@ -15,7 +15,7 @@ October 8, 2015
 1. Introduction - 5 min
 2. Packages - 5 min
 2. Tensors – 10 min
-3. Modules and Criterions – 10 min
+3. Neural Network – 10 min
 4. Training and Evaluation – 10 min
 5. Convolutional Neural Networks – 10 min
 6. Recurrent Neural Networks – 10 min
@@ -59,12 +59,12 @@ What's up with Torch 7?
 
 The Torch 7 distribution is made up of different packages, each its own github repository :
 
- * _torch7_/_cutorch_ : tensors, BLAS, file I/O (serialization), utilities for unit testing and cmd-line argument parsing ;
- * _nn/cunn_ : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
- * _optim_ : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
- * _trepl_ : torch read–eval–print loop, Lua interpreter, `th>` ;
- * _paths_ : file system manipulation package ;
- * _image_ : for saving, loading, constructing, transforming and displaying images ;
+ * __torch7__/__cutorch__ : tensors, BLAS, file I/O (serialization), utilities for unit testing and cmd-line argument parsing ;
+ * __nn__/__cunn__ : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
+ * __optim__ : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
+ * __trepl__ : torch read–eval–print loop, Lua interpreter, `th>` ;
+ * __paths__ : file system manipulation package ;
+ * __image__ : for saving, loading, constructing, transforming and displaying images ;
 
 Refer to the torch.ch website for a more complete list of official packages.
  
@@ -74,13 +74,13 @@ Refer to the torch.ch website for a more complete list of official packages.
 
 Many more non-official packages out there :
 
- * _dp_ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
- * _dpnn_ : extensions to the nn library. REINFORCE algorithm ;
- * _nnx_/_cunnx_ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
- * _rnn_ : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
- * _moses_ : utility-belt library for functional programming in Lua, mostly for tables ;
- * _threads_/_parallel_ : libraries for multi-threading or multi-processing ;
- * _async_ : asynchronous library for Lua, inspired by Node.js ;
+ * __dp__ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
+ * __dpnn__ : extensions to the nn library. REINFORCE algorithm ;
+ * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
+ * __rnn__ : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
+ * __moses__ : utility-belt library for functional programming in Lua, mostly for tables ;
+ * __threads__/__parallel__ : libraries for multi-threading or multi-processing ;
+ * __async__ : asynchronous library for Lua, inspired by Node.js ;
 
 ---
 
@@ -310,37 +310,69 @@ This is especially true for high-end cards like NVIDIA Titan X and such.
 
 ---
 
-# Modules and Criterions
+# Neural Network
 
-The _nn_ package uses `nn.Modules` and `nn.Criterions` for implementing modular backpropagation. 
-Backpropagation is gradient descent using the chain rule.
- 
-Modules are links in the gradient descent chain. 
-Essentially, backpropagation (learning) can be implemented with 3 methods :
- 
- * `[output] module:forward(input)` : calls `updateOutput`. Transforms `input` into `output`.
- * `[gradInput] module:backward(input, gradOutput [, scale])` : calls `updateGradInput` followed by `accGradParameters`.  Transforms `gradOutputs` into `gradInputs` and accumulates gradients w.r.t. parameters.
- * `module:updateParametes(lr)` : updates the parameters using the gradients w.r.t. parameters: `param = param - lr*gradParam`. 
- 
-Criterions measure the `loss` of a neural network (a graph of modules).
-They also have `forward`/`backward` methods :
+The __nn__ package : 
 
- * `[loss] criterion:forward(input, target)` : measures `loss` (a scalar) given `input` (output of the neural network) and `target` (supervised learning) ;
- * `[gradInput] criterion:backward(input, target)` : generates `gradInput` : gradient of `loss` w.r.t. to `input` ;
+ * implements feed-forward neural networks ;
+ * neural networks form a computational flow-graph of transformations (forward)  ;
+ * backpropagation is gradient descent using the chain rule (backward);
+ 
+Two abstract classes :
+
+ * `Module` :  differentiable transformations of input to output ;
+ * `Criterion` : cost function to minimize. Outputs a scalar loss;
+ 
+---
+ 
+# Neural Network - Logistic Regression
+
+A binary logisitic regressor `Module` with 2 input units and 1 output.
+
+```lua
+lreg = nn.Sequential()
+lreg:add(nn.Linear(2, 1))
+lreg:add(nn.Sigmoid())
+```
+
+A binary cross-entropy `Criterion` expects 0 or 1 valued targets:
+
+```lua
+bce = nn.BCECriterion()
+```
 
 ---
 
-# Modules and Criterions - SGD
+# Neural Network - Logistic Regression
 
-Modules and Criterions implement a differentiable equation that results in a scalar `loss`.
-For Stochastic Gradient Descent (SGD), the loss is minimized by obtaining
-the gradients w.r.t. the learnable parameters of the modules, 
-and moving (updating) the parameters in the opposite direction of these gradients. 
-These parameter updates are scaled by a small learning rate `lr`, typically between `0.1 and 0.0001`. 
+```
 
-Stochastic gradient descent is the most common training algorithm. 
-It can be augmented with momentum, which involves keeping an exponential moving average of the gradients w.r.t. parameters.
-The _dpnn_ package implements this via the `module:updateGradParameters(momentum)`.
+Some random dummy dataset with 10 samples:
+
+```lua
+inputs = torch.Tensor(10,2)
+targets = torch.Tensor(10):random(0,1)
+```
+
+Stochastic gradient descent (SGD) :
+
+```lua
+-- 
+for i=1,100 do
+   local idx = math.random(1,inputs:size(1))
+   local input, target = inputs[idx], targets[idx]
+   -- forward
+   local output = lreg:forward(input)
+   local loss = bce:forward(output, target)
+   -- backward
+   local gradOutput = bce:backward(output, target)
+   local gradInput = lreg:backward(input, gradOutput)
+   -- update
+   lreg:updateParameters(0.1)
+end
+```
+
+Forward, backward, update, forward, backward, update, ...
 
 ---
 
