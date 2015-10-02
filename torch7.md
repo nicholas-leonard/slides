@@ -402,7 +402,7 @@ end
 
 # Deep Learning
 
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/deeper.jpg)]
+background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
 
 What is deep learning?
  
