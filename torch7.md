@@ -577,6 +577,20 @@ Early-stops when no new maxima has been found for 30 consecutive epochs.
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/convnet.png)]
 
+Convolutional neural networks are often stacks of 3 layers :
+
+ 1. convolution : convolve `c` feature maps (parameters) over the image along height and width axes ; 
+ 2. sub-sampling : usually max-pooling, reduces the size (height x width) of feature maps ;
+ 3. transfer function : a non-linearity like `Tanh` or `ReLU` ;
+ 
+
+---
+
+## Convolutional Neural Network - Convolution
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/convolution.gif)]
+
+
 ---
 
 # Recurrent Neural Network
