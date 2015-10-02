@@ -400,15 +400,29 @@ end
 
 ---
 
-# Multi-Layer Perceptron
+# Deep Learning
 
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/deeper.jpg)]
 
 What is deep learning?
  
- * collection of techniques to improve the optimization and generalization of neural networks ;
+ * collection of techniques to improve the optimization and generalization of neural networks :
+  * rectified linear units ;
+  * dropout ;
+  * batch normalization ;
+  * weight decay regularization ;
+  * momentum learning ;
  * stacking layers of transformations to create successively more abstract levels of representations ;
+  * depth over breadth ;
+  * deep multi-layer perceptrons ;
+ * shared parameters : 
+  * convolutional neural networks ;
+  * recurrent neural networks ;
+ * technological improvements :
+  * massively parallel processing : GPUs, CUDA ;
+  * fast libraries : torch, cudnn, cuda-convnet, theano ;
  
+Let's start with a multi-layer perceptron...
 
 ---
 
