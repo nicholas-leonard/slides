@@ -579,7 +579,7 @@ Early-stops when no new maxima has been found for 30 consecutive epochs.
 
 Convolutional neural networks are often stacks of 3 layers :
 
- 1. convolution : convolve `c` feature maps (parameters) over the image along height and width axes ; 
+ 1. convolution : convolve a kernel over the image along height and width axes ; 
  2. sub-sampling : usually max-pooling, reduces the size (height x width) of feature maps ;
  3. transfer function : a non-linearity like `Tanh` or `ReLU` ;
  
@@ -588,8 +588,20 @@ Convolutional neural networks are often stacks of 3 layers :
 
 ## Convolutional Neural Network - Convolution
 
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/convolution.gif)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/convolution2.gif)]
 
+Convolution modules typically have the following arguments :
+
+ * `padSize` : how much zero-padding to add around the input image ;
+ * `inputSize` : number of input channels (e.g. 3 for RGB image) ;
+ * `outputSize` : number of feature maps in kernel (or number of output channels) ; 
+ * `kernelSize` : height and width of the kernel ;
+ * `kernelStride` : step-size of the kernel (typically 1) ;
+
+Parameters of the convolution (i.e. the kernel) :
+ 
+ * `weight` : 4D Tensor of size  `outputSize x inputSize x kernelSize x kernelSize` ;
+ * `bias` : 1D Tensor of size `outputSize` ;
 
 ---
 
