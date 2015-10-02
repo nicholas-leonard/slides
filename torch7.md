@@ -346,7 +346,7 @@ where the sigmoid (logistic function) is defined as :
 
 ---
 
-# Logistic Regression - Criterion
+# Logistic Regression - Criterion and Data
 
 A binary cross-entropy `Criterion` (which expects 0 or 1 valued targets) :
 
@@ -358,10 +358,6 @@ The BCE loss is defined as :
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce2.png)]
 
----
-
-# Logistic Regression - Training
-
 Some random dummy dataset with 10 samples:
 
 ```lua
@@ -369,21 +365,35 @@ inputs = torch.Tensor(10,2)
 targets = torch.Tensor(10):random(0,1)
 ```
 
-Stochastic gradient descent (SGD) :
+---
+
+# Logistic Regression - Training
+
+Function for one epoch of stochastic gradient descent (SGD)
+
+```lua
+function trainEpoch(module, criterion, inputs, targets)
+   for i=1,inputs:size(1) do
+      -- sample
+      local idx = math.random(1,inputs:size(1))
+      local input, target = inputs[idx], targets:narrow(1,idx,1)
+      -- forward
+      local output = module:forward(input)
+      local loss = criterion:forward(output, target)
+      -- backward
+      local gradOutput = criterion:backward(output, target)
+      local gradInput = module:backward(input, gradOutput)
+      -- update
+      module:updateParameters(0.1)
+   end
+end
+```
+
+Do 100 epochs to train the module :
 
 ```lua
 for i=1,100 do
-   -- sample
-   local idx = math.random(1,inputs:size(1))
-   local input, target = inputs[idx], targets:narrow(1,idx,1)
-   -- forward
-   local output = module:forward(input)
-   local loss = criterion:forward(output, target)
-   -- backward
-   local gradOutput = criterion:backward(output, target)
-   local gradInput = module:backward(input, gradOutput)
-   -- update
-   module:updateParameters(0.1)
+   trainEpoch(module, criterion, inputs, targets)
 end
 ```
 
@@ -391,15 +401,19 @@ end
 
 # Multi-Layer Perceptron
 
-Let's use the MNIST dataset :
+__dp__ provides the MNIST dataset :
 ```lua
 require 'dp'
 ds = dp.Mnist()
-inputs = ds:get('train', 'inputs', 'bchw')
-targets = ds:get('train', 'targets', 'b')
+-- train set
+trainInputs = ds:get('train', 'inputs', 'bchw')
+trainTargets = ds:get('train', 'targets', 'b')
+-- validation set
+validInputs = ds:get('valid', 'inputs', 'bchw')
+validTargets = ds:get('valid', 'targets', 'b')
 ```
 
-Then build an MLP with 2 layers of hidden units :
+An MLP with 2 layers of hidden units :
 
 ```lua
 module = nn.Sequential()
@@ -412,7 +426,7 @@ module:add(nn.Linear(200, 10))
 module:add(nn.LogSoftMax()) -- for classification problems
 ```
 
-A classifier with a `LogSoftMax` output can be used with a Negative Log-Likelihood (NLL) Criterion :
+Negative Log-Likelihood (NLL) Criterion :
 
 ```lua
 criterion = nn.ClassNLLCriterion()
@@ -422,9 +436,25 @@ criterion = nn.ClassNLLCriterion()
 
 # Multi-Layer Perceptron - Early Stopping
 
+A function to evaluate performance on the validation set :
 
+```lua
+require 'optim'
+cm = optim.ConfusionMatrix(10)
+function classEval(module, inputs, targets)
+   cm:reset()
+   for idx=1,inputs:size(1) do
+      local input, target = inputs[idx], targets:narrow(1,idx,1)
+      local output = module:forward(input)
+      cm:add(input, target)
+   end
+   cm:updateValids()
+   print(cm)
+   return cm.totalValids
+end
+```
 
-
+Using the same `trainEpoch` function, lets 
 
 
 ---
