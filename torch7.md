@@ -343,17 +343,6 @@ where the sigmoid (logistic function) is defined as :
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/sigmoid2.png)]
 
-Also, we can print modules :
-
-```lua
-th> print(lreg)
-nn.Sequential {
-  [input -> (1) -> (2) -> output]
-  (1): nn.Linear(2 -> 1)
-  (2): nn.Sigmoid
-}
-```
-
 ---
 
 # Logistic Regression - Criterion
