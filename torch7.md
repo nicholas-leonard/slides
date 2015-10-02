@@ -330,9 +330,10 @@ Two abstract classes :
 A binary logisitic regressor `Module` with 2 input units and 1 output.
 
 ```lua
-lreg = nn.Sequential()
-lreg:add(nn.Linear(2, 1))
-lreg:add(nn.Sigmoid())
+require 'nn'
+module = nn.Sequential()
+module:add(nn.Linear(2, 1))
+module:add(nn.Sigmoid())
 ```
 
 The above implements :
@@ -347,11 +348,13 @@ where the sigmoid (logistic function) is defined as :
 
 # Logistic Regression - Criterion
 
-A binary cross-entropy `Criterion` which expects 0 or 1 valued targets:
+A binary cross-entropy `Criterion` (which expects 0 or 1 valued targets) :
 
 ```lua
-bce = nn.BCECriterion()
+criterion = nn.BCECriterion()
 ```
+
+The BCE loss is defined as :
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce2.png)]
 
@@ -372,53 +375,54 @@ Stochastic gradient descent (SGD) :
 for i=1,100 do
    -- sample
    local idx = math.random(1,inputs:size(1))
-   local input, target = inputs[idx], targets[idx]
+   local input, target = inputs[idx], targets:narrow(1,idx,1)
    -- forward
-   local output = lreg:forward(input)
-   local loss = bce:forward(output, target)
+   local output = module:forward(input)
+   local loss = criterion:forward(output, target)
    -- backward
-   local gradOutput = bce:backward(output, target)
-   local gradInput = lreg:backward(input, gradOutput)
+   local gradOutput = criterion:backward(output, target)
+   local gradInput = module:backward(input, gradOutput)
    -- update
-   lreg:updateParameters(0.1)
+   module:updateParameters(0.1)
 end
 ```
 
 ---
 
-# Modules and Criterions - simple MLP
+# Multi-Layer Perceptron
 
-Let's build classifier using multi-layer perceptron (MLP) with 2 layers of hidden units using 
-a hyperbolic tangent non-linearity. First, define some hyper-parameters :
-
+Let's use the MNIST dataset :
 ```lua
-batchSize = 32
-inputSize = 20
-outputSize = 10 -- number of output classes
-hiddenSize = 30
+require 'dp'
+ds = dp.Mnist()
+inputs = ds:get('train', 'inputs', 'bchw')
+targets = ds:get('train', 'targets', 'b')
 ```
 
-Then build the `mlp` module :
+Then build an MLP with 2 layers of hidden units :
 
 ```lua
-mlp = nn.Sequential()
-mlp:add(nn.Linear(inputSize, hiddenSize))
-mlp:add(nn.Tanh()) -- hyperbolic tangent non-linearity
-mlp:add(nn.Linear(hiddenSize, hiddenSize))
-mlp:add(nn.Tanh()) 
-mlp:add(nn.Linear(hiddenSize, outputSize))
-mlp:add(nn.LogSoftMax()) -- for classification problems
+module = nn.Sequential()
+module:add(nn.Collapse(3))
+module:add(nn.Linear(1*28*28, 200))
+module:add(nn.Tanh())
+module:add(nn.Linear(200, 200))
+module:add(nn.Tanh()) 
+module:add(nn.Linear(200, 10))
+module:add(nn.LogSoftMax()) -- for classification problems
 ```
 
 A classifier with a `LogSoftMax` output can be used with a Negative Log-Likelihood (NLL) Criterion :
 
 ```lua
-nll = nn.ClassNLLCriterion()
+criterion = nn.ClassNLLCriterion()
 ```
 
 ---
 
-# Modules and Criterions - simple MLP
+# Multi-Layer Perceptron - Early Stopping
+
+
 
 
 
