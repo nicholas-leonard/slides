@@ -42,7 +42,7 @@ My background:
   
 ---
 
-# Introduction - Lua
+## Introduction - Lua
 
 Why take the time to learn Lua :
 
@@ -74,7 +74,7 @@ Output :
 
 ---
 
-# Introduction - Torch 7
+## Introduction - Torch 7
 
 What's up with Torch 7?
 
@@ -92,7 +92,7 @@ What's up with Torch 7?
 
 ---
 
-# Packages
+## Packages
 
 The Torch 7 distribution is made up of different packages, each its own github repository :
 
@@ -107,9 +107,9 @@ Refer to the torch.ch website for a more complete list of official packages.
  
 ---
 
-# Packages
+## Packages - Unofficial
 
-Many more non-official packages out there :
+Many more unofficial packages out there :
 
  * __dp__ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
  * __dpnn__ : extensions to the nn library. REINFORCE algorithm ;
@@ -138,7 +138,7 @@ Tensors are the main class of objects used in Torch 7 :
 
 ---
 
-# Tensors - Initialization
+## Tensors - Initialization
 
 A `3x2` Tensor  :
 
@@ -171,7 +171,7 @@ th> a:uniform(0,1) -- random uniform between 0 and 1
 
 ---
 
-# Tensors - Transpose
+## Tensors - Transpose
 
 Let's create a new Tensor `b`, the transpose of dimensions `1` and `2` of Tensor `a` :
 
@@ -197,7 +197,7 @@ th> a
 
 ---
 
-# Tensors - Storage
+## Tensors - Storage
 
 This is what the storage looks like :
 
@@ -225,7 +225,7 @@ th> unpack(b:stride():totable())
 
 ---
 
-# Tensor - Contiguous
+## Tensor - Contiguous
 
 Are `a` and `b` contiguous?
 
@@ -252,7 +252,7 @@ th> b:storage()
 
 ---
 
-# Tensors - Clone/Copy
+## Tensors - Clone/Copy
 
 We can make it contiguous by cloning it :
 
@@ -277,7 +277,7 @@ Above it does because `b.new()` intializes an empty Tensor.
 
 ---
 
-# Tensors - Resize
+## Tensors - Resize
 
 Calling `resize()` again doesn't allocate new memory (it already has the right size) :
 
@@ -304,10 +304,9 @@ false
 ```
 Tensors `d` and `e` have different storages after the resize.
 
-
 ---
 
-# Tensors - BLAS
+## Tensors - BLAS
 
 .center[![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)]
 
@@ -328,7 +327,7 @@ This is a common operation used by the popular `nn.Linear` module.
 
 ---
 
-# Tensors - CUDA
+## Tensors - CUDA
 
 Let's what the difference is for doing the previous matrix-matrix multiply using CUDA :
 
@@ -347,7 +346,7 @@ This is especially true for high-end cards like NVIDIA Titan X and such.
 
 ---
 
-# Neural Network
+# Neural Network library
 
 The __nn__ package : 
 
@@ -360,9 +359,11 @@ Two abstract classes :
  * `Module` :  differentiable transformations of input to output ;
  * `Criterion` : cost function to minimize. Outputs a scalar loss;
  
+Let's use it to build a simple logistic regressor...
+
 ---
  
-# Logistic Regression - Module
+## Logistic Regression - Module
 
 A binary logisitic regressor `Module` with 2 input units and 1 output.
 
@@ -383,7 +384,7 @@ where the sigmoid (logistic function) is defined as :
 
 ---
 
-# Logistic Regression - Criterion and Data
+## Logistic Regression - Criterion and Data
 
 A binary cross-entropy `Criterion` (which expects 0 or 1 valued targets) :
 
@@ -404,7 +405,7 @@ targets = torch.Tensor(10):random(0,1)
 
 ---
 
-# Logistic Regression - Training
+## Logistic Regression - Training
 
 Function for one epoch of stochastic gradient descent (SGD)
 
@@ -441,19 +442,19 @@ end
 
 What is deep learning?
  
- * collection of techniques to improve the optimization and generalization of neural networks :
+ * **collection of techniques** to improve the optimization and **generalization** of neural networks :
   * rectified linear units ;
   * dropout ;
   * batch normalization ;
   * weight decay regularization ;
   * momentum learning ;
- * stacking layers of transformations to create successively more abstract levels of representations ;
+ * **stacking layers** of transformations to create successively more abstract **levels of representations** ;
   * depth over breadth ;
   * deep multi-layer perceptrons ;
- * shared parameters : 
+ * **shared parameters** : 
   * convolutional neural networks ;
   * recurrent neural networks ;
- * technological improvements :
+ * **technological improvements** :
   * massively parallel processing : GPUs, CUDA ;
   * fast libraries : torch, cudnn, cuda-convnet, theano ;
 
@@ -461,11 +462,11 @@ What is deep learning?
 
 background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
 
-# Deep Learning - Summary 
+## Deep Learning - Summary 
 
 ---
 
-# Deep Learning - MNIST dataset
+## Deep Learning - MNIST dataset
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mnist.png)]
 
@@ -502,7 +503,7 @@ An MLP is a stack of parameterized non-linear layers :
 
 ---
 
-# Multi-Layer Perceptron - Module and Criterion
+## Multi-Layer Perceptron - Module and Criterion
 
 An MLP with 2 layers of hidden units :
 
@@ -525,7 +526,7 @@ criterion = nn.ClassNLLCriterion()
 
 ---
 
-# Multi-Layer Perceptron - Cross-validation
+## Multi-Layer Perceptron - Cross-validation
 
 A function to evaluate performance on the validation set :
 
@@ -547,7 +548,7 @@ end
 
 ---
 
-# Multi-Layer Perceptron - Early-Stopping
+## Multi-Layer Perceptron - Early-Stopping
 
 Early-stopping on the validation set :
 
@@ -594,7 +595,7 @@ Convolution modules typically have the following arguments :
 
  * `padSize` : how much zero-padding to add around the input image ;
  * `inputSize` : number of input channels (e.g. 3 for RGB image) ;
- * `outputSize` : number of feature maps in kernel (or number of output channels) ; 
+ * `outputSize` : number of feature maps in kernel ; 
  * `kernelSize` : height and width of the kernel ;
  * `kernelStride` : step-size of the kernel (typically 1) ;
 
@@ -604,6 +605,12 @@ Parameters of the convolution (i.e. the kernel) :
  * `bias` : 1D Tensor of size `outputSize` ;
 
 ---
+
+## Convolutional Neural Network - Sub-sampling
+
+
+---
+
 
 # Recurrent Neural Network
 
