@@ -337,11 +337,11 @@ lreg:add(nn.Sigmoid())
 
 The above implements :
 
-_.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/logreg.png)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/logreg2.png)]
 
 where the sigmoid (logistic function) is defined as :
 
-_.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/sigmoid.png)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/sigmoid2.png)]
 
 Also, we can print modules :
 
@@ -364,7 +364,7 @@ A binary cross-entropy `Criterion` which expects 0 or 1 valued targets:
 bce = nn.BCECriterion()
 ```
 
-_.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce.png)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bce2.png)]
 
 ---
 
