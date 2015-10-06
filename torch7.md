@@ -633,10 +633,9 @@ print(input, output)
    6   8
   14  16
 [torch.DoubleTensor of size 1x2x2]
-
 ```
 
---- 
+---
 
 ## Convolutional Neural Network - MNIST
 
