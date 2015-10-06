@@ -838,6 +838,6 @@ Neural network language model (NNLM) :
 ## Recurrent Neural Network - RNNLM
 
 
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnnlm.jpeg)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnnlm2.jpeg)]
   
 ---
