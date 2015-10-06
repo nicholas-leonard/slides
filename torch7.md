@@ -27,7 +27,7 @@ October 8, 2015
 
 My background:
 
- * 2003-2008 : Bacc. Degree in Computer Science at Royal Military College of Canada ;
+ * 2003-2008 : Bac. Degree in Comp. Sci. at Royal Military College of Canada ;
  * 2008-2012 : Army Signals Officer : 
    * management (office politics, emails), no code, no science ;
    * hobby : neural networks using Python and numpy ;
