@@ -645,14 +645,12 @@ Convolutional Neural Network for the MNIST dataset :
 ```lua
 cnn = nn.Sequential()
 cnn:add(nn.Convert()) -- cast input to same type as cnn
--- 2 conv layers :
 cnn:add(nn.SpatialConvolution(1, 16, 5, 5, 1, 1, 2, 2))
 cnn:add(nn.ReLU())
 cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
 cnn:add(nn.SpatialConvolution(16, 32, 5, 5, 1, 1, 2, 2))
 cnn:add(nn.ReLU())
 cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
--- 1 dense hidden layer :
 outsize = cnn:outside{1,1,28, 28} -- output size of convolutions
 cnn:add(nn.Linear(outsize[2]*outsize[3]*outsize[4], 200))
 cnn:add(nn.ReLU())
