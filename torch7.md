@@ -16,7 +16,7 @@ October 8, 2015
 2. Packages - 5 min
 2. Tensors – 10 min
 3. Logistic Regression – 5 min
-4. Deep Learning - 2 min
+4. Deep Learning - 5 min
 5. Multi-Layer Perceptron- 5 min
 5. Convolutional Neural Network – 10 min
 6. Recurrent Neural Network – 10 min
@@ -92,11 +92,11 @@ What's up with Torch 7?
 
 ---
 
-## Packages
+# Packages
 
 The Torch 7 distribution is made up of different packages, each its own github repository :
 
- * __torch7__/__cutorch__ : tensors, BLAS, file I/O (serialization), utilities for unit testing and cmd-line argument parsing ;
+ * __torch7__/__cutorch__ : tensors, BLAS, file I/O (serialization), OOP, unit testing and cmd-line argument parsing ;
  * __nn__/__cunn__ : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
  * __optim__ : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
  * __trepl__ : torch read–eval–print loop, Lua interpreter, `th>` ;
@@ -140,10 +140,10 @@ Tensors are the main class of objects used in Torch 7 :
 
 ## Tensors - Initialization
 
-A `3x2` Tensor  :
+A `2x3` Tensor  :
 
 ```lua
-th> a = torch.FloatTensor(3,2)
+th> a = torch.FloatTensor(2,3)
 -- initialized with garbage content (whatever was already there)
 th> a 
  8.6342e+19  4.5694e-41  8.6342e+19
@@ -319,7 +319,7 @@ input = torch.FloatTensor(batchSize, inputSize):uniform(0,1)
 weight = torch.FloatTensor(outputSize, inputSize):unfirom(0,1)
 output = torch.FloatTensor()
 -- matrix matrix multiply :
-output:addmm(0, self.output, 1, input, weight:t())
+output:addmm(0, output, 1, input, weight:t())
 ```
 
 `output` will be automatically resized to `batchSize x outputSize`.
@@ -337,7 +337,7 @@ input = torch.CudaTensor(batchSize, inputSize):uniform(0,1)
 weight = torch.CudaTensor(outputSize, inputSize):unfirom(0,1)
 output = torch.CudaTensor()
 -- matrix matrix multiply :
-output:addmm(0, self.output, 1, input, weight:t())
+output:addmm(0, output, 1, input, weight:t())
 ```
 
 So basically, no difference except for use of `torch.CudaTensor`.
@@ -353,6 +353,8 @@ The __nn__ package :
  * implements feed-forward neural networks ;
  * neural networks form a computational flow-graph of transformations (forward)  ;
  * backpropagation is gradient descent using the chain rule (backward);
+ 
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/chain-rule2.png)
  
 Two abstract classes :
 
@@ -382,6 +384,8 @@ where the sigmoid (logistic function) is defined as :
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/sigmoid2.png)]
 
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/sigmoidgraph2.png)]
+
 ---
 
 ## Logistic Regression - Criterion and Data
@@ -399,7 +403,7 @@ The BCE loss is defined as :
 Some random dummy dataset with 10 samples:
 
 ```lua
-inputs = torch.Tensor(10,2)
+inputs = torch.Tensor(10,2):uniform(-1,1)
 targets = torch.Tensor(10):random(0,1)
 ```
 
@@ -438,7 +442,13 @@ end
 
 ---
 
+background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
+
 # Deep Learning
+
+---
+
+## Deep Learning
 
 What is deep learning?
  
@@ -457,12 +467,6 @@ What is deep learning?
  * **technological improvements** :
   * massively parallel processing : GPUs, CUDA ;
   * fast libraries : torch, cudnn, cuda-convnet, theano ;
-
----
-
-background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
-
-## Deep Learning - Summary 
 
 ---
 
@@ -578,11 +582,11 @@ Early-stops when no new maxima has been found for 30 consecutive epochs.
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/convnet.png)]
 
-Convolutional neural networks are often stacks of 3 layers :
+CNNs are often stacks of meta-layers each made from 3 layers :
 
- 1. convolution : convolve a kernel over the image along height and width axes ; 
- 2. sub-sampling : usually max-pooling, reduces the size (height x width) of feature maps ;
- 3. transfer function : a non-linearity like `Tanh` or `ReLU` ;
+ 1. **convolution** : convolve a kernel over the image along height and width axes ; 
+ 2. **sub-sampling** : reduce the size (height x width) of feature maps by pooling them spatially;
+ 3. **transfer function** : a non-linearity like `Tanh` or `ReLU` ;
  
 
 ---
@@ -601,14 +605,69 @@ Convolution modules typically have the following arguments :
 
 Parameters of the convolution (i.e. the kernel) :
  
- * `weight` : 4D Tensor of size  `outputSize x inputSize x kernelSize x kernelSize` ;
- * `bias` : 1D Tensor of size `outputSize` ;
+ * `weight` : 4D Tensor `outputSize x inputSize x kernelSize x kernelSize` ;
+ * `bias` : 1D Tensor `outputSize` ;
+
+---
+ 
+## Convolutional Neural Network - SpatialConvolution
+
+`SpatialConvolution` with 3 input and 4 output channels using a `5x5` kernel on a `14x14` image :
+
+```lua
+input = torch.rand(3,12,12)
+conv = nn.SpatialConvolution(3,4,5,5)
+output = conv:forward(input)
+print(unpack(output:size():totable()))
+4  8  8
+```
+
+Now with 2 pixels of padding on each side:
+
+```lua
+conv = nn.SpatialConvolution(3,4,5,5,1,1,2,2)
+output = conv:forward(input)
+print(unpack(output:size():totable()))
+4  12  12
+```
 
 ---
 
 ## Convolutional Neural Network - Sub-sampling
 
+Sub-sampling modules :
+ 
+ * typically max-pooling is used : `SpatialMaxPooling` ;
+ * makes the model translation-invariant ;
+ * reduces the size of the spatial dimensions ;
+ 
+`SpatialMaxPooling` to max-pool inputs in a `2x2` area with a stride of 2 (no overlap):
 
+```lua
+input = torch.range(1,16):double():resize(1,4,4)
+pool = nn.SpatialMaxPooling(2,2,2,2)
+output = pool:forward(input)
+print(input, output)
+(1,.,.) = 
+   1   2   3   4
+   5   6   7   8
+   9  10  11  12
+  13  14  15  16
+[torch.DoubleTensor of size 1x4x4]
+
+(1,.,.) = 
+   6   8
+  14  16
+[torch.DoubleTensor of size 1x2x2]
+
+```
+
+--- 
+
+## Convolutional Neural Network - MNIST
+
+
+ 
 ---
 
 
