@@ -800,7 +800,7 @@ Without CUDA, i.e. using CPU instead of GPU :
 ==> example speed = 328.75346894227 examples/s    
 ```
 
-`10x` speedup.
+`10x` speedup using NVIDIA Titan Black GPU.
 
 ---
 
@@ -821,10 +821,10 @@ Simple RNN :
 
 Predict the next word given the previous words :
 
- 1. `h` -> `e`
- 2. `h, e` -> `l`
- 3. `h, e, l` -> `l`
- 4. `h, e, l, l` -> `o`
+ 1. `we` -> `need`
+ 2. `we, need` -> `to`
+ 3. `we, need, to` -> `go`
+ 4. `we, need, to, go` -> `deeper`
    
 Neural network language model (NNLM) :
 
@@ -835,9 +835,67 @@ Neural network language model (NNLM) :
  
 ---
 
-## Recurrent Neural Network - RNNLM
-
+## Recurrent Neural Network - Language Model
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnnlm2.jpeg)]
   
 ---
+
+## Recurrent Neural Network - Back-propagation Through Time
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bptt.jpeg)]
+
+Back-propagation through time :
+  
+  * forward `rho` time steps ;
+  * unfold network for `rho` time-steps ;
+  * back-propagate through unfolded network ;
+  * accumulate parameter gradients (sum over time-steps) ;
+
+## Recurrent Neural Network - rnn
+
+Use the __rnn__ package to build an RNNLM :
+
+```lua
+require 'rnn'
+
+rec = nn.Recurrent(
+   30, nn.LookupTable(10000, 30), 
+   nn.Linear(30, 30), nn.Sigmoid(), 5
+)
+
+rnn = nn.Sequential()
+rnn:add(nn.Sequencer(rec))
+rnn:add(nn.Sequencer(nn.Linear(40, 10000)))
+rnn:add(nn.Sequencer(nn.LogSoftMax()))
+
+criterion = nn.SequencerCriterion(nn.ClassNLLCriterion())
+```
+
+`Sequencer` sequentially applies decorated module to input.
+
+---
+
+## Recurrent Neural Network - rnn
+
+Train on Penn Tree Bank dataset. Each sample has `rho=5` time-steps :
+
+```lua
+ds = dp.PennTreeBank{recurrent=true, context_size=5}
+trainSet = ds:trainSet()
+
+local batch
+for i=1,1000 do
+   batch = trainSet:sample(batch, 32)
+   local inputs, targets = batch:inputs():input(), batch:targets():input()
+   -- forward
+   local outputs = rnn:forward(inputs)
+   local err = criterion:forward(outputs, targets)
+   -- backward
+   local gradOutputs = criterion:backward(outputs, targets)
+   rnn:zeroGradParameters()
+   rnn:backward(inputs, gradOutputs) -- Backward Through Time
+   -- update
+   rnn:updateParameters(0.1)
+end
+```
