@@ -696,7 +696,7 @@ Use __dp__ to train `cnn`.  Build a `Propagator` for each set:
 ```lua
 train = dp.Optimizer{
    loss = nn.ModuleCriterion(nn.ClassNLLCriterion(), nil, nn.Convert()),
-   callback = function(model, report) -- called every batch
+   callback = function(model, report)
       model:updateGradParameters(0.9) -- momentum
       model:updateParameters(0.1) -- learning rate
       model:maxParamNorm(2) -- max norm constraint on weight matrix rows
@@ -732,28 +732,19 @@ xp = dp.Experiment{
 }
 ```
 
-Cast `Experiment` to CUDA. Use GPU device `1` :
-
-```
-require 'cutorch'
-require 'cunn'
-cutorch.setDevice(1)
-xp:cuda()
-```
-
-Run the experiment on the `ds = dp.Mnist()` dataset :
+Cast `Experiment` to `cuda` :
 
 ```lua
-print(cnn)
-xp:run(ds)
+require 'cutorch'
+require 'cunn'
+xp:cuda()
 ```
 
 ---
 
 ## Convolutional Neural Network - dp
 
-Output will look somewhat like this :
-
+The `cnn` looks like this :
 ```lua
 nn.Sequential {
   [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> (8) -> (9) -> (10) -> (11) -> (12) -> output]
@@ -770,9 +761,24 @@ nn.Sequential {
   (11): nn.Linear(200 -> 10)
   (12): nn.LogSoftMax
 }
+```
+
+Run the experiment on the `ds = dp.Mnist()` dataset :
+
+```lua
+xp:run(ds)
+```
+
+---
+
+## Convolutional Neural Network - dp
+
+Output will look somewhat like this :
+
+```lua
 ==> epoch # 1 for optimizer :
  [========================================= 50000/50000 ==================================>] ETA: 0ms | Step: 0ms          
-==> example speed = 3307.5264556521 examples/s  
+* ==> example speed = 3307.5264556521 examples/s  
 rhea:1444146704:1:optimizer:loss avgErr 0.0071848043689877
 rhea:1444146704:1:optimizer:confusion accuracy = 0.92722
 rhea:1444146704:1:validator:confusion accuracy = 0.9749 
@@ -787,7 +793,14 @@ rhea:1444146704:1:tester:confusion accuracy = 0.9831
 ==> epoch # 3 for optimizer :   
 ...
 ```
+
+Without CUDA, i.e. using CPU instead of GPU :
+
+```lua     
+==> example speed = 328.75346894227 examples/s    
+```
  
+
 ---
 
 
