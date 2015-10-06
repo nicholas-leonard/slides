@@ -12,14 +12,14 @@ October 8, 2015
 
 # Agenda
 
-1. Introduction - 5 min
-2. Packages - 5 min
-2. Tensors – 10 min
-3. Logistic Regression – 5 min
-4. Deep Learning - 5 min
-5. Multi-Layer Perceptron- 5 min
-5. Convolutional Neural Network – 10 min
-6. Recurrent Neural Network – 10 min
+1. Introduction
+2. Packages
+3. Tensors 
+4. Logistic Regression
+5. Deep Learning 
+6. Multi-Layer Perceptron
+7. Convolutional Neural Network 
+8. Recurrent Neural Network
 
 ---
 
@@ -279,35 +279,6 @@ Above it does because `b.new()` intializes an empty Tensor.
 
 ---
 
-## Tensors - Resize
-
-Calling `resize()` again doesn't allocate new memory (it already has the right size) :
-
-```lua
-th> d:resize(b:size())
-th> d:storage():size()
-6
-```
-
-An neither would resizing it to a smaller size :
-
-```lua
-th> d:resize(3)
-th> d:storage():size()
-6
-```
-
-But resizing to a greater size will allocate new memory :
-
-```lua
-th> e = torch.FloatTensor(d):resize(3,3)
-th> e:storage():size() == d:storage():size()
-false
-```
-Tensors `d` and `e` have different storages after the resize.
-
----
-
 ## Tensors - BLAS
 
 .center[![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)]
@@ -331,7 +302,7 @@ This is a common operation used by the popular `nn.Linear` module.
 
 ## Tensors - CUDA
 
-Let's what the difference is for doing the previous matrix-matrix multiply using CUDA :
+Previous matrix-matrix multiply using CUDA :
 
 ```lua
 require 'cutorch'
@@ -692,9 +663,10 @@ cnn:add(nn.LogSoftMax())
 
 ---
 
-## Convolutional Neural Network - dp
+## Convolutional Neural Network - dp.Propagator
 
 Use __dp__ to train `cnn`.  Build a `Propagator` for each set:
+
 ```lua
 train = dp.Optimizer{
    loss = nn.ModuleCriterion(nn.ClassNLLCriterion(), nil, nn.Convert()),
@@ -718,7 +690,7 @@ test = dp.Evaluator{
 
 ---
 
-## Convolutional Neural Network - dp
+## Convolutional Neural Network - dp.Experiment
 
 Build and `Experiment` :
 
@@ -900,7 +872,7 @@ Criterion is `ClassNLLCriterion` applied to each time-step:
 ```lua
 criterion = nn.ModuleCriterion(
    nn.SequencerCriterion(nn.ClassNLLCriterion()), 
-   nn.PrintSize('input'), 
+   nil, 
    nn.SplitTable(1,1):type('torch.IntTensor')
 )
 ```
@@ -919,7 +891,6 @@ for i=1,1000 do
    batch = trainSet:sample(batch, 32)
    local inputs, targets = batch:inputs():input(), batch:targets():input()
    -- forward
-   rnn:forget() -- rnn forgets previous state
    local outputs = rnn:forward(inputs)
    local err = criterion:forward(outputs, targets)
    -- backward
