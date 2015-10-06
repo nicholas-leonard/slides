@@ -20,7 +20,6 @@ October 8, 2015
 5. Multi-Layer Perceptron- 5 min
 5. Convolutional Neural Network – 10 min
 6. Recurrent Neural Network – 10 min
-7. Hyper-optimization – 5 min
 
 ---
 
@@ -29,7 +28,9 @@ October 8, 2015
 My background:
 
  * 2003-2008 : Bacc. Degree in Computer Science at Royal Military College of Canada ;
- * 2008-2012 : Army Signals Officer : management (office politics, emails), no code, no science ;
+ * 2008-2012 : Army Signals Officer : 
+   * management (office politics, emails), no code, no science ;
+   * hobby : neural networks using Python and numpy ;
  * 2012-2014 : Master's Degree in Deep Learning at University of Montreal ;
   * LISA/MILA lab ;
   * Yoshua Bengio and Aaron Courville as co-directors ;
@@ -87,7 +88,8 @@ What's up with Torch 7?
   * fast and efficient GPU support ;
   * embeddable, with ports to iOS, Android and FPGA backends ;
   * under development since October 2002 ;
-  * used by Facebook, Google [DeepMind], Twitter, NYU, ...
+  * used by Facebook, Google [DeepMind], Twitter, NYU, ... ;
+  * documentation, tutorials, demos, examples ;
 
 
 ---
@@ -121,7 +123,7 @@ Many more unofficial packages out there :
 
 ---
 
-# Tensors
+## Tensors 
 
 Tensors are the main class of objects used in Torch 7 :
 
@@ -810,6 +812,7 @@ Without CUDA, i.e. using CPU instead of GPU :
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnn.png)]
 
 Simple RNN : 
+
  * for modeling sequential data like text, speech, videos ;
  * 3 layers : input (`V`), recurrent (`U`) and output (`W`) layer ;
  * feed the previous state as input to next state ;
@@ -835,22 +838,41 @@ Neural network language model (NNLM) :
  
 ---
 
-## Recurrent Neural Network - Language Model
+## Recurrent Neural Network - Character-Level RNNLM
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnnlm2.jpeg)]
   
 ---
 
-## Recurrent Neural Network - Back-propagation Through Time
+## Recurrent Neural Network - BPTT
 
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bptt.jpeg)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bptt.png)]
 
 Back-propagation through time :
   
-  * forward `rho` time steps ;
+  * forward-propagate for `rho` time-steps ;
   * unfold network for `rho` time-steps ;
   * back-propagate through unfolded network ;
   * accumulate parameter gradients (sum over time-steps) ;
+  
+---
+
+## Recurrent Neural Network - Penn Tree Bank
+
+Penn Tree Bank dataset :
+
+ * common benchmark for language models ;
+ * 10000 word vocabulary ;
+ * approx. 1 million words of text ;
+
+Use __dp__ to get Penn Tree Bank dataset :
+
+```lua
+ds = dp.PennTreeBank{recurrent=true, context_size=5}
+trainSet = ds:trainSet()
+```
+
+---
 
 ## Recurrent Neural Network - rnn
 
@@ -859,36 +881,45 @@ Use the __rnn__ package to build an RNNLM :
 ```lua
 require 'rnn'
 
-rec = nn.Recurrent(
-   30, nn.LookupTable(10000, 30), 
-   nn.Linear(30, 30), nn.Sigmoid(), 5
-)
-
 rnn = nn.Sequential()
-rnn:add(nn.Sequencer(rec))
-rnn:add(nn.Sequencer(nn.Linear(40, 10000)))
+rnn:add(nn.LookupTable(10000, 30))
+rnn:add(nn.SplitTable(1,2)) 
+rnn:add(nn.Sequencer(nn.Recurrent(30, nn.Identity(), nn.Linear(30, 30))))
+rnn:add(nn.Sequencer(nn.Linear(30, 10000)))
 rnn:add(nn.Sequencer(nn.LogSoftMax()))
-
-criterion = nn.SequencerCriterion(nn.ClassNLLCriterion())
 ```
 
-`Sequencer` sequentially applies decorated module to input.
+`Sequencer` sequentially applies decorated module to input table.
 
 ---
 
 ## Recurrent Neural Network - rnn
 
-Train on Penn Tree Bank dataset. Each sample has `rho=5` time-steps :
+Criterion is `ClassNLLCriterion` applied to each time-step:
 
 ```lua
-ds = dp.PennTreeBank{recurrent=true, context_size=5}
-trainSet = ds:trainSet()
+criterion = nn.ModuleCriterion(
+   nn.SequencerCriterion(nn.ClassNLLCriterion()), 
+   nn.PrintSize('input'), 
+   nn.SplitTable(1,1):type('torch.IntTensor')
+)
+```
 
+`SplitTable` converts `targets` Tensor to table of Tensors.
+
+---
+
+## Recurrent Neural Network - rnn
+
+Training loop of 1000 batches of 32 samples of 5 time-steps:
+
+```lua
 local batch
 for i=1,1000 do
    batch = trainSet:sample(batch, 32)
    local inputs, targets = batch:inputs():input(), batch:targets():input()
    -- forward
+   rnn:forget() -- rnn forgets previous state
    local outputs = rnn:forward(inputs)
    local err = criterion:forward(outputs, targets)
    -- backward
@@ -899,3 +930,10 @@ for i=1,1000 do
    rnn:updateParameters(0.1)
 end
 ```
+
+---
+
+# Questions ?
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/tweakingnn.gif)]
+
