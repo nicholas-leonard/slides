@@ -354,7 +354,7 @@ The __nn__ package :
  * neural networks form a computational flow-graph of transformations (forward)  ;
  * backpropagation is gradient descent using the chain rule (backward);
  
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/chain-rule2.png)
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/chain-rule2.png)]
  
 Two abstract classes :
 
@@ -777,14 +777,14 @@ Output will look somewhat like this :
 
 ```lua
 ==> epoch # 1 for optimizer :
- [========================================= 50000/50000 ==================================>] ETA: 0ms | Step: 0ms          
-* ==> example speed = 3307.5264556521 examples/s  
+ [================= 50000/50000 ================>] ETA: 0ms | Step: 0ms          
+==> example speed = 3307.5264556521 examples/s  
 rhea:1444146704:1:optimizer:loss avgErr 0.0071848043689877
 rhea:1444146704:1:optimizer:confusion accuracy = 0.92722
 rhea:1444146704:1:validator:confusion accuracy = 0.9749 
 rhea:1444146704:1:tester:confusion accuracy = 0.9791
 ==> epoch # 2 for optimizer :   
- [========================================= 50000/50000 ==================================>] ETA: 0ms | Step: 0ms          
+ [================= 50000/50000 ================>] ETA: 0ms | Step: 0ms          
 ==> example speed = 3324.6636764618 examples/s  
 rhea:1444146704:1:optimizer:loss avgErr 0.0020881871616095
 rhea:1444146704:1:optimizer:confusion accuracy = 0.97956
@@ -799,13 +799,45 @@ Without CUDA, i.e. using CPU instead of GPU :
 ```lua     
 ==> example speed = 328.75346894227 examples/s    
 ```
- 
+
+`10x` speedup.
 
 ---
 
 
 # Recurrent Neural Network
 
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnn.png)]
+
+Simple RNN : 
+ * for modeling sequential data like text, speech, videos ;
+ * 3 layers : input (`V`), recurrent (`U`) and output (`W`) layer ;
+ * feed the previous state as input to next state ;
+ * long sequences suffer from exploding and vanishing gradient ;
+
 ---
 
+## Recurrent Neural Network - Language Model
 
+Predict the next word given the previous words :
+
+ 1. `h` -> `e`
+ 2. `h, e` -> `l`
+ 3. `h, e, l` -> `l`
+ 4. `h, e, l, l` -> `o`
+   
+Neural network language model (NNLM) :
+
+ * learn an embedding space of words ;
+ * each word is a vector of parameters ;
+ * embedding space is implemented using `LookupTable` ;
+ * embedding space is a `weight` matrix of size `vocabSize x embedSize` ;
+ 
+---
+
+## Recurrent Neural Network - RNNLM
+
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnnlm.jpeg)]
+  
+---
