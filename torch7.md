@@ -586,7 +586,7 @@ Parameters of the convolution (i.e. the kernel) :
  
 ## Convolutional Neural Network - SpatialConvolution
 
-`SpatialConvolution` with 3 input and 4 output channels using a `5x5` kernel on a `14x14` image :
+`SpatialConvolution` with 3 input and 4 output channels using a `5x5` kernel on a `12x12` image :
 
 ```lua
 input = torch.rand(3,12,12)
