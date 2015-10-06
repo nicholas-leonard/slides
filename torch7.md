@@ -50,7 +50,7 @@ Why take the time to learn Lua :
  * easy interface between low-level C/CUDA/C++ and high-level Lua ;
  * light-weight : used for embedded systems ;
  * tables :
-   * can be used as lists, dictionaries, classes and objects ;
+   * can be used as lists, dictionaries, packages, classes and objects ;
    * make it easy to extend existing classes (at any level) ;
  * fast for-loops (LuaJIT) ;
  * closures ;
@@ -205,7 +205,6 @@ This is what the storage looks like :
 
 ```lua
 th> a:storage()
-
  0.6323
  0.9232
  0.2930
@@ -324,8 +323,8 @@ This is especially true for high-end cards like NVIDIA Titan X and such.
 The __nn__ package : 
 
  * implements feed-forward neural networks ;
- * neural networks form a computational flow-graph of transformations (forward)  ;
- * backpropagation is gradient descent using the chain rule (backward);
+ * neural networks form a computational flow-graph of transformations ;
+ * backpropagation is gradient descent using the chain rule ;
  
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/chain-rule2.png)]
  
@@ -401,7 +400,7 @@ function trainEpoch(module, criterion, inputs, targets)
       local gradInput = module:backward(input, gradOutput)
       -- update
       module:updateGradParameters(0.9) -- momentum (dpnn)
-      module:updateParameters(0.1) -- learning rate
+      module:updateParameters(0.1) -- W = W - 0.1*dL/dW
    end
 end
 ```
@@ -487,6 +486,7 @@ An MLP with 2 layers of hidden units :
 
 ```lua
 module = nn.Sequential()
+module:add(nn.Convert())
 module:add(nn.Collapse(3))
 module:add(nn.Linear(1*28*28, 200))
 module:add(nn.Tanh())
@@ -512,11 +512,11 @@ A function to evaluate performance on the validation set :
 require 'optim'
 cm = optim.ConfusionMatrix(10)
 function classEval(module, inputs, targets)
-   cm:reset()
+   cm:zero()
    for idx=1,inputs:size(1) do
       local input, target = inputs[idx], targets:narrow(1,idx,1)
       local output = module:forward(input)
-      cm:add(input, target)
+      cm:add(output, target)
    end
    cm:updateValids()
    print(cm)
@@ -559,8 +559,8 @@ Early-stops when no new maxima has been found for 30 consecutive epochs.
 CNNs are often stacks of meta-layers each made from 3 layers :
 
  1. **convolution** : convolve a kernel over the image along height and width axes ; 
- 2. **sub-sampling** : reduce the size (height x width) of feature maps by pooling them spatially;
- 3. **transfer function** : a non-linearity like `Tanh` or `ReLU` ;
+ 2. **transfer function** : a non-linearity like `Tanh` or `ReLU` ;
+ 3. **sub-sampling** : reduce the size (height x width) of feature maps by pooling them spatially;
  
 
 ---
@@ -644,12 +644,14 @@ Convolutional Neural Network for the MNIST dataset :
 ```lua
 cnn = nn.Sequential()
 cnn:add(nn.Convert()) -- cast input to same type as cnn
+-- 2 conv layers :
 cnn:add(nn.SpatialConvolution(1, 16, 5, 5, 1, 1, 2, 2))
 cnn:add(nn.ReLU())
 cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
 cnn:add(nn.SpatialConvolution(16, 32, 5, 5, 1, 1, 2, 2))
 cnn:add(nn.ReLU())
 cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
+-- 1 dense hidden layer :
 outsize = cnn:outside{1,1,28, 28} -- output size of convolutions
 cnn:add(nn.Linear(outsize[2]*outsize[3]*outsize[4], 200))
 cnn:add(nn.ReLU())
