@@ -36,7 +36,7 @@ My background:
   * Yoshua Bengio and Aaron Courville as co-directors ;
   * 2012-2013 : Python, Theano and Pylearn2 ;
   * 2013-today : Lua, Torch7 ;
- * 2014-today : employed at Element Inc. :
+ * 2014-today : research engineer at Element Inc. :
   * biometrics startup ;
   * deep learning on smart phones (Android, iOS) ;
   * open source contributions (Torch7).
