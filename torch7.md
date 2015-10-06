@@ -424,6 +424,7 @@ function trainEpoch(module, criterion, inputs, targets)
       local loss = criterion:forward(output, target)
       -- backward
       local gradOutput = criterion:backward(output, target)
+      module:zeroGradParameters()
       local gradInput = module:backward(input, gradOutput)
       -- update
       module:updateGradParameters(0.9) -- momentum (dpnn)
@@ -641,7 +642,7 @@ Sub-sampling modules :
  * makes the model translation-invariant ;
  * reduces the size of the spatial dimensions ;
  
-`SpatialMaxPooling` to max-pool inputs in a `2x2` area with a stride of 2 (no overlap):
+`SpatialMaxPooling` to pool inputs in a `2x2` area with a stride of 2:
 
 ```lua
 input = torch.range(1,16):double():resize(1,4,4)
@@ -666,7 +667,126 @@ print(input, output)
 
 ## Convolutional Neural Network - MNIST
 
+Convolutional Neural Network for the MNIST dataset :
 
+```lua
+cnn = nn.Sequential()
+cnn:add(nn.Convert()) -- cast input to same type as cnn
+-- 2 conv layers :
+cnn:add(nn.SpatialConvolution(1, 16, 5, 5, 1, 1, 2, 2))
+cnn:add(nn.ReLU())
+cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
+cnn:add(nn.SpatialConvolution(16, 32, 5, 5, 1, 1, 2, 2))
+cnn:add(nn.ReLU())
+cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
+-- 1 dense hidden layer :
+outsize = cnn:outside{1,1,28, 28} -- output size of convolutions
+cnn:add(nn.Linear(outsize[2]*outsize[3]*outsize[4], 200))
+cnn:add(nn.ReLU())
+-- output layer
+cnn:add(nn.Linear(200, 10))
+cnn:add(nn.LogSoftMax())
+```
+
+---
+
+## Convolutional Neural Network - dp
+
+Use __dp__ to train `cnn`.  Build a `Propagator` for each set:
+```lua
+train = dp.Optimizer{
+   loss = nn.ModuleCriterion(nn.ClassNLLCriterion(), nil, nn.Convert()),
+   callback = function(model, report) -- called every batch
+      model:updateGradParameters(0.9) -- momentum
+      model:updateParameters(0.1) -- learning rate
+      model:maxParamNorm(2) -- max norm constraint on weight matrix rows
+      model:zeroGradParameters()
+   end,
+   feedback = dp.Confusion(), -- wraps optim.ConfusionMatrix
+   sampler = dp.ShuffleSampler{batch_size = 32}, 
+   progress = true
+}
+valid = dp.Evaluator{
+   feedback = dp.Confusion(), sampler = dp.Sampler{batch_size = 32}
+}
+test = dp.Evaluator{
+   feedback = dp.Confusion(), sampler = dp.Sampler{batch_size = 32}
+}
+```
+
+---
+
+## Convolutional Neural Network - dp
+
+Build and `Experiment` :
+
+```lua
+xp = dp.Experiment{
+   model = cnn,
+   optimizer = train, validator = valid, tester = test,
+   observer = dp.EarlyStopper{
+      error_report = {'validator','feedback','confusion','accuracy'},
+      maximize = true, max_epochs = 50 
+   },
+   random_seed = os.time(), max_epoch = 2000
+}
+```
+
+Cast `Experiment` to CUDA. Use GPU device `1` :
+
+```
+require 'cutorch'
+require 'cunn'
+cutorch.setDevice(1)
+xp:cuda()
+```
+
+Run the experiment on the `ds = dp.Mnist()` dataset :
+
+```lua
+print(cnn)
+xp:run(ds)
+```
+
+---
+
+## Convolutional Neural Network - dp
+
+Output will look somewhat like this :
+
+```lua
+nn.Sequential {
+  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> (8) -> (9) -> (10) -> (11) -> (12) -> output]
+  (1): nn.Convert
+  (2): nn.SpatialConvolution(1 -> 16, 5x5)
+  (3): nn.ReLU
+  (4): nn.SpatialMaxPooling(2,2,2,2)
+  (5): nn.SpatialConvolution(16 -> 32, 5x5)
+  (6): nn.ReLU
+  (7): nn.SpatialMaxPooling(2,2,2,2)
+  (8): nn.Collapse
+  (9): nn.Linear(512 -> 200)
+  (10): nn.ReLU
+  (11): nn.Linear(200 -> 10)
+  (12): nn.LogSoftMax
+}
+==> epoch # 1 for optimizer :
+ [========================================= 50000/50000 ==================================>] ETA: 0ms | Step: 0ms          
+==> example speed = 3307.5264556521 examples/s  
+rhea:1444146704:1:optimizer:loss avgErr 0.0071848043689877
+rhea:1444146704:1:optimizer:confusion accuracy = 0.92722
+rhea:1444146704:1:validator:confusion accuracy = 0.9749 
+rhea:1444146704:1:tester:confusion accuracy = 0.9791
+==> epoch # 2 for optimizer :   
+ [========================================= 50000/50000 ==================================>] ETA: 0ms | Step: 0ms          
+==> example speed = 3324.6636764618 examples/s  
+rhea:1444146704:1:optimizer:loss avgErr 0.0020881871616095
+rhea:1444146704:1:optimizer:confusion accuracy = 0.97956
+rhea:1444146704:1:validator:confusion accuracy = 0.9794 
+rhea:1444146704:1:tester:confusion accuracy = 0.9831
+==> epoch # 3 for optimizer :   
+...
+```
  
 ---
 
