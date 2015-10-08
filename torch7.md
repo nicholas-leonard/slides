@@ -4,6 +4,8 @@ class: center, middle
 
 Nicholas Leonard
 
+nl@discoverelement.com
+
 Element Inc.
 
 October 8, 2015
@@ -273,7 +275,8 @@ th> d:isContiguous()
 true
 ```
 
-Note : `clone()` allocates memory, while `copy()` doesn't. However, `resize()` sometimes does. 
+Note : `clone()` allocates memory, while `copy()` doesn't. 
+However, `resize()` sometimes does. 
 Above it does because `b.new()` intializes an empty Tensor. 
 
 ---
@@ -314,7 +317,6 @@ output:addmm(0, output, 1, input, weight:t())
 
 So basically, no difference except for use of `torch.CudaTensor`.
 However, it will be much faster on GPU than CPU for larger Tensors.
-This is especially true for high-end cards like NVIDIA Titan X and such.
 
 ---
 
@@ -471,7 +473,7 @@ validTargets = ds:get('valid', 'targets', 'b')
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mlp.png)]
 
-An MLP is a stack of parameterized non-linear layers :
+An MLP is a stack of non-linear layers :
 
  * each layer is an affine transform (`Linear`) followed by a transfer function (`Tanh`, `ReLU`, `SoftMax`) ;
  * parameters (`weight`, `bias`) are found in the `Linear` module ;
@@ -486,8 +488,7 @@ An MLP with 2 layers of hidden units :
 
 ```lua
 module = nn.Sequential()
-module:add(nn.Convert())
-module:add(nn.Collapse(3))
+module:add(nn.Convert('bchw', 'bf')) -- collapse 3D to 1D
 module:add(nn.Linear(1*28*28, 200))
 module:add(nn.Tanh())
 module:add(nn.Linear(200, 200))
@@ -519,7 +520,6 @@ function classEval(module, inputs, targets)
       cm:add(output, target)
    end
    cm:updateValids()
-   print(cm)
    return cm.totalValids
 end
 ```
@@ -612,7 +612,7 @@ print(unpack(output:size():totable()))
 Sub-sampling modules :
  
  * typically max-pooling is used : `SpatialMaxPooling` ;
- * makes the model translation-invariant ;
+ * makes the model more invariant to translation ;
  * reduces the size of the spatial dimensions ;
  
 `SpatialMaxPooling` to pool inputs in a `2x2` area with a stride of 2:
@@ -643,7 +643,7 @@ Convolutional Neural Network for the MNIST dataset :
 
 ```lua
 cnn = nn.Sequential()
-cnn:add(nn.Convert()) -- cast input to same type as cnn
+cnn:add(nn.Convert('bhwc', 'bchw')) -- cast input to same type as cnn
 -- 2 conv layers :
 cnn:add(nn.SpatialConvolution(1, 16, 5, 5, 1, 1, 2, 2))
 cnn:add(nn.ReLU())
@@ -653,6 +653,7 @@ cnn:add(nn.ReLU())
 cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
 -- 1 dense hidden layer :
 outsize = cnn:outside{1,1,28, 28} -- output size of convolutions
+cnn:add(nn.Collapse(3))
 cnn:add(nn.Linear(outsize[2]*outsize[3]*outsize[4], 200))
 cnn:add(nn.ReLU())
 -- output layer
@@ -720,19 +721,18 @@ xp:cuda()
 The `cnn` looks like this :
 ```lua
 nn.Sequential {
-  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> (8) -> (9) -> (10) -> (11) -> (12) -> output]
+  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> (8) -> (9) -> (10) -> (11) -> output]
   (1): nn.Convert
-  (2): nn.SpatialConvolution(1 -> 16, 5x5)
+  (2): nn.SpatialConvolution(1 -> 16, 5x5, 1,1, 2,2)
   (3): nn.ReLU
   (4): nn.SpatialMaxPooling(2,2,2,2)
-  (5): nn.SpatialConvolution(16 -> 32, 5x5)
+  (5): nn.SpatialConvolution(16 -> 32, 5x5, 1,1, 2,2)
   (6): nn.ReLU
   (7): nn.SpatialMaxPooling(2,2,2,2)
-  (8): nn.Collapse
-  (9): nn.Linear(512 -> 200)
-  (10): nn.ReLU
-  (11): nn.Linear(200 -> 10)
-  (12): nn.LogSoftMax
+  (8): nn.Linear(1568 -> 200)
+  (9): nn.ReLU
+  (10): nn.Linear(200 -> 10)
+  (11): nn.LogSoftMax
 }
 ```
 
@@ -905,5 +905,5 @@ end
 
 # Questions ?
 
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/tweakingnn.gif)]
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/questions.jpg)]
 
