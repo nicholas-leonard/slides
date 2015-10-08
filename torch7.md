@@ -116,12 +116,11 @@ Refer to the torch.ch website for a more complete list of official packages.
 Many more unofficial packages out there :
 
  * __dp__ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
- * __dpnn__ : extensions to the nn library. REINFORCE algorithm ;
+ * __dpnn__ : extensions to the nn library. More modules. REINFORCE algorithm ;
  * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
  * __rnn__ : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
  * __moses__ : utility-belt library for functional programming in Lua, mostly for tables ;
  * __threads__/__parallel__ : libraries for multi-threading or multi-processing ;
- * __async__ : asynchronous library for Lua, inspired by Node.js ;
 
 ---
 
@@ -129,16 +128,16 @@ Many more unofficial packages out there :
 
 Tensors are the main class of objects used in Torch 7 :
 
- * An N-dimensional array that views an underlying `Storage` (a contiguous 1D-array);
+ * An N-dimensional array that views an underlying `Storage`;
  * Different Tensors can share the same `Storage`;
- * Different types : `FloatTensor`, `DoubleTensor`, `IntTensor`, `CudaTensor`, and so on ;
- * Implements most Basic Linear Algebra Sub-routines (BLAS) : 
+ * Different types : `FloatTensor`, `DoubleTensor`, `IntTensor`, `CudaTensor`, ...;
+ * Implements many Basic Linear Algebra Sub-routines (BLAS) : 
    * `torch.addmm` : matrix-matrix multiplication ;
    * `torch.addmv` : matrix-vector multiplication ;
    * `torch.addr` :  outer-product between vectors ;
    * etc.  
  * Supports random initialization, indexing, transposition, sub-tensor extractions, and more ;
- * Most operations for Float/Double are also implemented for Cuda Tensors (via cutorch) ;
+ * Most operations for Float/Double are also implemented for Cuda Tensors (via __cutorch__) ;
 
 ---
 
