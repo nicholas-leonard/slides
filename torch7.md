@@ -834,6 +834,7 @@ Use __dp__ to get Penn Tree Bank dataset :
 ```lua
 ds = dp.PennTreeBank{recurrent=true, context_size=5}
 trainSet = ds:trainSet()
+```
 
 Sample of `inputs` and `targets` :
 ```lua
