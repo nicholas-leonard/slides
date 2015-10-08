@@ -866,12 +866,6 @@ rnn:add(nn.Sequencer(nn.Linear(30, 10000)))
 rnn:add(nn.Sequencer(nn.LogSoftMax()))
 ```
 
-`Sequencer` sequentially applies decorated module to input table.
-
----
-
-## Recurrent Neural Network - rnn
-
 Criterion is `ClassNLLCriterion` applied to each time-step:
 
 ```lua
@@ -881,8 +875,6 @@ criterion = nn.ModuleCriterion(
    nn.SplitTable(1,1):type('torch.IntTensor')
 )
 ```
-
-`SplitTable` converts `targets` Tensor to table of Tensors.
 
 ---
 
