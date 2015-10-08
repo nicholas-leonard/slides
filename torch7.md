@@ -116,7 +116,7 @@ Refer to the torch.ch website for a more complete list of official packages.
 Many more unofficial packages out there :
 
  * __dp__ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
- * __dpnn__ : extensions to the nn library. More modules. REINFORCE algorithm ;
+ * __dpnn__ : extensions to the nn library. More modules. ;
  * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
  * __rnn__ : recurrent neural network library. Implements RNN, LSTM, BRNN, BLSTM, and RAM ;
  * __moses__ : utility-belt library for functional programming in Lua, mostly for tables ;
@@ -808,12 +808,6 @@ Neural network language model (NNLM) :
  
 ---
 
-## Recurrent Neural Network - Character-Level RNNLM
-
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/rnnlm2.jpeg)]
-  
----
-
 ## Recurrent Neural Network - BPTT
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/bptt.png)]
@@ -840,6 +834,18 @@ Use __dp__ to get Penn Tree Bank dataset :
 ```lua
 ds = dp.PennTreeBank{recurrent=true, context_size=5}
 trainSet = ds:trainSet()
+
+Sample of `inputs` and `targets` :
+```lua
+   36  1516   853    94  1376
+ 3193   433   553   805   521
+  512   434    57  1029  1962
+[torch.IntTensor of size 3x5]
+                           
+ 1516   853    94  1376   719
+  433   553   805   521    27
+  434    57  1029  1962    49
+[torch.IntTensor of size 3x5]
 ```
 
 ---
