@@ -290,7 +290,7 @@ Let's multiply an `input` and a `weight` matrix into an `output` matrix :
 ```lua
 batchSize, inputSize, outputSize = 4, 2, 3
 input = torch.FloatTensor(batchSize, inputSize):uniform(0,1)
-weight = torch.FloatTensor(outputSize, inputSize):unfirom(0,1)
+weight = torch.FloatTensor(outputSize, inputSize):uniform(0,1)
 output = torch.FloatTensor()
 -- matrix matrix multiply :
 output:addmm(0, output, 1, input, weight:t())
@@ -308,7 +308,7 @@ Previous matrix-matrix multiply using CUDA :
 ```lua
 require 'cutorch'
 input = torch.CudaTensor(batchSize, inputSize):uniform(0,1)
-weight = torch.CudaTensor(outputSize, inputSize):unfirom(0,1)
+weight = torch.CudaTensor(outputSize, inputSize):uniform(0,1)
 output = torch.CudaTensor()
 -- matrix matrix multiply :
 output:addmm(0, output, 1, input, weight:t())
