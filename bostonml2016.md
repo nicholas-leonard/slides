@@ -494,6 +494,10 @@ conv = nn.SpatialConvolution(3,4,5,5,1,1,2,2)
 output = conv:forward(input) -- size is 4 x 12 x 12
 ``` 
 
+Learns filters like : 
+
+.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/filters.jpg)]
+
 ---
 
 ## Convolutional Neural Network - Sub-sampling
