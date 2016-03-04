@@ -4,7 +4,7 @@ class: center, middle
 
 Nicholas Leonard
 
-nl@discoverelement.com
+https://github.com/nicholas-leonard
 
 Element Inc.
 
@@ -115,10 +115,10 @@ Refer to the torch.ch website for a more complete list of official packages.
 
 Many more unofficial packages out there :
 
- * __dp__ : deep learning library for cross-validation (early-stopping). An alternative to optim inspired by Pylearn2. Lots of documentation and examples ;
- * __dpnn__ : extensions to the nn library. More modules. ;
- * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
+ * __dpnn__ : extensions to the nn library. ;
  * __rnn__ : recurrent neural network library. Implements RNN, GRU, LSTM, BRNN, and RAM ;
+ * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
+ * __dp__ : deep learning library for cross-validation (early-stopping) ;
  * __moses__ : utility-belt library for functional programming in Lua, mostly for tables ;
  * __threads__/__parallel__ : libraries for multi-threading or multi-processing ;
 
@@ -174,112 +174,6 @@ th> a:uniform(0,1) -- random uniform between 0 and 1
 
 ---
 
-## Tensors - Transpose
-
-Let's create a new Tensor `b`, the transpose of dimensions `1` and `2` of Tensor `a` :
-
-```lua
-th> b = a:transpose(1,2)
-```
-
-Tensor `a` and `b` share the same underlying storage (look at the `1.0000` in both):
-
-```lua
-th> b[{1,2}] = 1
-th> b
- 0.6323  1.0000
- 0.9232  0.5131
- 0.2930  0.9101
-[torch.FloatTensor of size 3x2]
-
-th> a
- 0.6323  0.9232  0.2930
- 1.0000  0.5131  0.9101
-[torch.FloatTensor of size 2x3]
-```
-
----
-
-## Tensors - Storage
-
-This is what the storage looks like :
-
-```lua
-th> a:storage()
- 0.6323
- 0.9232
- 0.2930
- 1.0000
- 0.5131
- 0.9101
-[torch.FloatStorage of size 6]
-```
-
-Yet `a` and `b` have different strides :
-
-```lua
-th> unpack(a:stride():totable())
-3  1
-
-th> unpack(b:stride():totable())
-1  3
-```
-
----
-
-## Tensor - Contiguous
-
-Are `a` and `b` contiguous?
-
-```lua
-th> a:isContiguous(), b:isContiguous()
-true false
-```
-
-Tensor `b` isn't. This means that the elements in the last dimension (the row) aren't contiguous in memory :
-
-```lua
-th> b[{1,1}], b[{1,2}], b[{2,1}]
-0.63226145505905	1	0.92315602302551	
-
-th> b:storage()
- 0.6323 -- 1,1
- 0.9232 -- 2,1
- 0.2930
- 1.0000 -- 1,2
- 0.5131
- 0.9101
-[torch.FloatStorage of size 6]
-```
-
----
-
-## Tensors - Clone/Copy
-
-We can make it contiguous by cloning it :
-
-```lua
-th> c = b:clone()
-th> c:isContiguous()
-true
-```
-
-or by copying it :
-
-```lua
-th> d = b.new()
-th> d:resize(b:size())
-th> d:copy(b)
-th> d:isContiguous()
-true
-```
-
-Note : `clone()` allocates memory, while `copy()` doesn't. 
-However, `resize()` sometimes does. 
-Above it does because `b.new()` intializes an empty Tensor. 
-
----
-
 ## Tensors - BLAS
 
 .center[![mmm](https://raw.githubusercontent.com/nicholas-leonard/slides/master/matrixmul.png)]
@@ -296,7 +190,6 @@ output = torch.FloatTensor(batchSize, outputSize):zero()
 output:addmm(0, output, 1, input, weight:t())
 ```
 
-`output` will be automatically resized to `batchSize x outputSize`.
 This is a common operation used by the popular `nn.Linear` module.
 
 ---
@@ -315,7 +208,6 @@ output:addmm(0, output, 1, input, weight:t())
 ```
 
 So basically, no difference except for use of `torch.CudaTensor`.
-However, it will be much faster on GPU than CPU for larger Tensors.
 
 ---
 
@@ -331,8 +223,8 @@ The __nn__ package :
  
 Two abstract classes :
 
- * `Module` :  differentiable transformations of input to output ;
- * `Criterion` : cost function to minimize. Outputs a scalar loss;
+ * `nn.Module` :  differentiable transformations of input to output ;
+ * `nn.Criterion` : cost function to minimize. Outputs a scalar loss;
  
 Let's use it to build a simple logistic regressor...
 
@@ -367,7 +259,7 @@ A binary cross-entropy `Criterion` (which expects 0 or 1 valued targets) :
 
 ```lua
 criterion = nn.BCECriterion()
-```
+``` 
 
 The BCE loss is defined as :
 
@@ -378,7 +270,7 @@ Some random dummy dataset with 10 samples:
 ```lua
 inputs = torch.Tensor(10,2):uniform(-1,1)
 targets = torch.Tensor(10):random(0,1)
-```
+``` 
 
 ---
 
@@ -404,7 +296,7 @@ function trainEpoch(module, criterion, inputs, targets)
       module:updateParameters(0.1) -- W = W - 0.1*dL/dW
    end
 end
-```
+``` 
 
 Do 100 epochs to train the module :
 
@@ -412,13 +304,7 @@ Do 100 epochs to train the module :
 for i=1,100 do
    trainEpoch(module, criterion, inputs, targets)
 end
-```
-
----
-
-background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
-
-# Deep Learning
+``` 
 
 ---
 
@@ -453,18 +339,25 @@ __dp__ makes it easy to obtain the MNIST dataset :
 ```lua
 require 'dp'
 ds = dp.Mnist()
-```
+``` 
 
-Training and validation set inputs and targets :
+Training and validation sets :
 
 ```lua
 trainInputs = ds:get('train', 'inputs', 'bchw')
 trainTargets = ds:get('train', 'targets', 'b')
+
 validInputs = ds:get('valid', 'inputs', 'bchw')
 validTargets = ds:get('valid', 'targets', 'b')
-```
+``` 
 
 *bchw* specifies axis order : `batch x color x height x width`
+
+---
+
+background-image: url(https://raw.githubusercontent.com/nicholas-leonard/slides/master/we-need-to-go-deeper.jpg)
+
+# Deep Learning
 
 ---
 
@@ -494,19 +387,15 @@ module:add(nn.Linear(200, 200))
 module:add(nn.Tanh()) 
 module:add(nn.Linear(200, 10))
 module:add(nn.LogSoftMax()) -- for classification problems
-```
+``` 
 
 Negative Log-Likelihood (NLL) Criterion :
 
 ```lua
 criterion = nn.ClassNLLCriterion()
-```
+``` 
 
 ---
-## Multi-Layer Perceptron - Overfitting (bad)
-
-.center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/overfitting.jpg)]
-
 ## Multi-Layer Perceptron - Cross-validation
 
 A function to evaluate performance on the validation set :
@@ -524,7 +413,9 @@ function classEval(module, inputs, targets)
    cm:updateValids()
    return cm.totalValids
 end
-```
+``` 
+
+Measure model's ability to *generalize* to new data.
 
 ---
 
@@ -548,7 +439,7 @@ for epoch=1,300 do
       if wait > 30 then break end
    end
 end
-```
+``` 
 
 Early-stops when no new maxima has been found for 30 consecutive epochs.
 
@@ -593,19 +484,15 @@ Parameters of the convolution (i.e. the kernel) :
 ```lua
 input = torch.rand(3,12,12)
 conv = nn.SpatialConvolution(3,4,5,5)
-output = conv:forward(input)
-print(unpack(output:size():totable()))
-4  8  8
-```
+output = conv:forward(input) -- size is 4 x 8 x 8
+``` 
 
 Now with 2 pixels of padding on each side:
 
 ```lua
 conv = nn.SpatialConvolution(3,4,5,5,1,1,2,2)
-output = conv:forward(input)
-print(unpack(output:size():totable()))
-4  12  12
-```
+output = conv:forward(input) -- size is 4 x 12 x 12
+``` 
 
 ---
 
@@ -635,7 +522,7 @@ print(input, output)
    6   8
   14  16
 [torch.DoubleTensor of size 1x2x2]
-```
+``` 
 
 ---
 
@@ -661,67 +548,15 @@ cnn:add(nn.ReLU())
 -- output layer
 cnn:add(nn.Linear(200, 10))
 cnn:add(nn.LogSoftMax())
-```
+``` 
 
 ---
 
-## Convolutional Neural Network - dp.Propagator
-
-Use __dp__ to train `cnn`.  Build a `Propagator` for each set:
-
-```lua
-train = dp.Optimizer{
-   loss = nn.ModuleCriterion(nn.ClassNLLCriterion(), nil, nn.Convert()),
-   callback = function(model, report)
-      model:updateGradParameters(0.9) -- momentum
-      model:updateParameters(0.1) -- learning rate
-      model:maxParamNorm(2) -- max norm constraint on weight matrix rows
-      model:zeroGradParameters()
-   end,
-   feedback = dp.Confusion(), -- wraps optim.ConfusionMatrix
-   sampler = dp.ShuffleSampler{batch_size = 32}, 
-   progress = true
-}
-valid = dp.Evaluator{
-   feedback = dp.Confusion(), sampler = dp.Sampler{batch_size = 32}
-}
-test = dp.Evaluator{
-   feedback = dp.Confusion(), sampler = dp.Sampler{batch_size = 32}
-}
-```
-
----
-
-## Convolutional Neural Network - dp.Experiment
-
-Build and `Experiment` :
-
-```lua
-xp = dp.Experiment{
-   model = cnn,
-   optimizer = train, validator = valid, tester = test,
-   observer = dp.EarlyStopper{
-      error_report = {'validator','feedback','confusion','accuracy'},
-      maximize = true, max_epochs = 50 
-   },
-   max_epoch = 2000
-}
-```
-
-Cast `Experiment` to `cuda` :
-
-```lua
-require 'cutorch'
-require 'cunn'
-xp:cuda()
-```
-
----
-
-## Convolutional Neural Network - dp
+## Convolutional Neural Network - Print Module
 
 The `cnn` looks like this :
 ```lua
+print(cnn)
 nn.Sequential {
   [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> (8) -> (9) -> (10) -> (11) -> output]
   (1): nn.Convert
@@ -736,19 +571,13 @@ nn.Sequential {
   (10): nn.Linear(200 -> 10)
   (11): nn.LogSoftMax
 }
-```
-
-Run the experiment on the `ds = dp.Mnist()` dataset :
-
-```lua
-xp:run(ds)
-```
+``` 
 
 ---
 
-## Convolutional Neural Network - dp
+## Convolutional Neural Network - Training
 
-Output will look somewhat like this :
+Example output when training `cnn:cuda()` with __dp__ :
 
 ```lua
 ==> epoch # 1 for optimizer :
@@ -795,7 +624,7 @@ Simple RNN :
 
 ## Recurrent Neural Network - Language Model
 
-Maximize likelihood ofnext word given previous words :
+Maximize likelihood of next word given previous words (input -> target) :
 
  1. `we` -> `need`
  2. `we, need` -> `to`
@@ -817,8 +646,8 @@ Neural network language model (NNLM) :
 
 Back-propagation through time :
   
-  * forward-propagate for `rho` time-steps ;
-  * unfold network for `rho` time-steps ;
+  * forward-propagate for `T` time-steps ;
+  * unfold network for `T` time-steps ;
   * back-propagate through unfolded network ;
   * accumulate parameter gradients (sum over time-steps) ;
   
@@ -837,7 +666,7 @@ Use __dp__ to get Penn Tree Bank dataset :
 ```lua
 ds = dp.PennTreeBank{recurrent=true, context_size=5}
 trainSet = ds:trainSet()
-```
+``` 
 
 Sample of `inputs` and `targets` :
 ```lua
@@ -850,49 +679,53 @@ Sample of `inputs` and `targets` :
   433   553   805   521    27
   434    57  1029  1962    49
 [torch.IntTensor of size 3x5]
-```
+``` 
 
 ---
 
 ## Recurrent Neural Network - rnn
 
-Use the __rnn__ package to build an RNNLM :
+Use the __rnn__ package to build an RNNLM.
+
+A module that implements recurrence `{x[t], h[t-1]} -> h[t]` :
 
 ```lua
-require 'rnn'
+rm = nn.Sequential() -- input is {x[t], h[t-1]}
+   :add(nn.ParallelTable()
+      :add(nn.LookupTable(10000, 200)) -- input layer (V)
+      :add(nn.Linear(200, 200))) -- recurrent layer (U)
+   :add(nn.CAddTable()) 
+   :add(nn.Sigmoid()) -- output is h[t]
+``` 
 
+Wrap into a `Recurrence` module and add an output layer:
+
+```
 rnn = nn.Sequential()
-rnn:add(nn.LookupTable(10000, 30))
-rnn:add(nn.SplitTable(1,2)) 
-rnn:add(nn.Sequencer(nn.Recurrent(30, nn.Identity(), nn.Linear(30, 30))))
-rnn:add(nn.Sequencer(nn.Linear(30, 10000)))
-rnn:add(nn.Sequencer(nn.LogSoftMax()))
-```
+   :add(nn.Recurrence(rm, hiddenSize, 0)) 
+   :add(nn.Linear(200, 10000)) -- output layer (W)
+   :add(nn.LogSoftMax())
+``` 
 
-Criterion is `ClassNLLCriterion` applied to each time-step:
+Wrap into a `Sequencer` to handle one sequence per `forward` call:
 
-```lua
-criterion = nn.ModuleCriterion(
-   nn.SequencerCriterion(nn.ClassNLLCriterion()), 
-   nil, 
-   nn.SplitTable(1,1):type('torch.IntTensor')
-)
 ```
+rnn = nn.Sequencer(rnn)
+``` 
 
 ---
 
 ## Recurrent Neural Network - rnn
 
-Training loop of 1000 batches of 32 samples of 5 time-steps:
+Training loop of 1000 batches of 32 sequences of 5 time-steps:
 
 ```lua
 local batch
 for i=1,1000 do
-   batch = trainSet:sample(batch, 32)
-   local inputs, targets = batch:inputs():input(), batch:targets():input()
+   local inputs, targets = trainSet:sample(32)
    -- forward
    local outputs = rnn:forward(inputs)
-   local err = criterion:forward(outputs, targets)
+   local err = criterion:forward(outputs, targets) -- ClassNLLCriterion
    -- backward
    local gradOutputs = criterion:backward(outputs, targets)
    rnn:zeroGradParameters()
@@ -900,7 +733,7 @@ for i=1,1000 do
    -- update
    rnn:updateParameters(0.1)
 end
-```
+``` 
 
 ---
 
