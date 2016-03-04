@@ -704,7 +704,7 @@ rm = nn.Sequential() -- input is {x[t], h[t-1]}
 
 Wrap into a `Recurrence` module and add an output layer:
 
-```
+```lua
 rnn = nn.Sequential()
    :add(nn.Recurrence(rm, hiddenSize, 0)) 
    :add(nn.Linear(200, 10000)) -- output layer (W)
@@ -713,7 +713,7 @@ rnn = nn.Sequential()
 
 Wrap into a `Sequencer` to handle one sequence per `forward` call:
 
-```
+```lua
 rnn = nn.Sequencer(rnn)
 ``` 
 
