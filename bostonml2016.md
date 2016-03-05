@@ -351,7 +351,7 @@ validInputs = ds:get('valid', 'inputs', 'bchw')
 validTargets = ds:get('valid', 'targets', 'b')
 ``` 
 
-*bchw* specifies axis order : `batch x color x height x width`
+*bchw* specifies axes order : `batch x channel x height x width`
 
 ---
 
@@ -369,8 +369,8 @@ An MLP is a stack of non-linear layers :
 
  * each layer is an affine transform (`Linear`) followed by a transfer function (`Tanh`, `ReLU`, `SoftMax`) ;
  * parameters (`weight`, `bias`) are found in the `Linear` module ;
- * transfer functions help to model complex relationships between input and output (non-linear);
  * parameters are varied to fit the data ;
+ * transfer functions help to model complex relationships between input and output (non-linear);
 
 ---
 
@@ -466,7 +466,7 @@ Convolution modules typically have the following arguments :
 
  * `padSize` : how much zero-padding to add around the input image ;
  * `inputSize` : number of input channels (e.g. 3 for RGB image) ;
- * `outputSize` : number of feature maps in kernel ; 
+ * `outputSize` : number of output channels (number of filters) ; 
  * `kernelSize` : height and width of the kernel ;
  * `kernelStride` : step-size of the kernel (typically 1) ;
 
@@ -600,7 +600,7 @@ rhea:1444146704:1:validator:confusion accuracy = 0.9794
 rhea:1444146704:1:tester:confusion accuracy = 0.9831
 ==> epoch # 3 for optimizer :   
 ...
-```
+``` 
 
 Without CUDA, i.e. using CPU instead of GPU :
 
@@ -719,25 +719,24 @@ rnn = nn.Sequencer(rnn)
 
 ---
 
-## Recurrent Neural Network - rnn
+## Recurrent Neural Network - Character LM
 
-Training loop of 1000 batches of 32 sequences of 5 time-steps:
+Text generated using char-level LM trained on reddit comments:
 
 ```lua
-local batch
-for i=1,1000 do
-   local inputs, targets = trainSet:sample(32)
-   -- forward
-   local outputs = rnn:forward(inputs)
-   local err = criterion:forward(outputs, targets) -- ClassNLLCriterion
-   -- backward
-   local gradOutputs = criterion:backward(outputs, targets)
-   rnn:zeroGradParameters()
-   rnn:backward(inputs, gradOutputs) -- Backward Through Time
-   -- update
-   rnn:updateParameters(0.1)
-end
+<post>
+Diablo
+<comment score=1>
+I liked this game so much!! Hope telling that numbers' benefits and 
+features never found out at that level is a total breeze 
+because it's not even a developer/voice opening and rusher runs 
+the game against so many people having noticeable purchases of selling 
+the developers built or trying to run the patch to Jagex.
+</comment>
 ``` 
+
+Looks good! Wait a second...
+
 
 ---
 
