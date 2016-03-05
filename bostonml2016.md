@@ -721,8 +721,9 @@ rnn = nn.Sequencer(rnn)
 
 ## Recurrent Neural Network - Character LM
 
-Ref. : A. https://github.com/karpathy/char-rnn
-B. https://github.com/hughperkins/char-lstm
+References :
+ * https://github.com/karpathy/char-rnn
+ * https://github.com/hughperkins/char-lstm
 
 Text generated using char-level LM trained on 1M reddit comments:
 
@@ -739,7 +740,6 @@ the developers built or trying to run the patch to Jagex.
 ``` 
 
 Looks good! Wait a second...
-
 
 ---
 
