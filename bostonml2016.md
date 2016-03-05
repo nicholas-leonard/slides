@@ -672,7 +672,7 @@ ds = dp.PennTreeBank{recurrent=true, context_size=5}
 trainSet = ds:trainSet()
 ``` 
 
-Sample of `inputs` and `targets` :
+Batch of 3 sample sequences of `inputs` and `targets` :
 ```lua
    36  1516   853    94  1376
  3193   433   553   805   521
@@ -721,9 +721,12 @@ rnn = nn.Sequencer(rnn)
 
 ## Recurrent Neural Network - Character LM
 
-Text generated using char-level LM trained on reddit comments:
+Ref. : A. https://github.com/karpathy/char-rnn
+B. https://github.com/hughperkins/char-lstm
 
-```lua
+Text generated using char-level LM trained on 1M reddit comments:
+
+```
 <post>
 Diablo
 <comment score=1>
