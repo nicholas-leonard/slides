@@ -17,11 +17,11 @@ April , 2016
 1. Introduction
 2. Packages
 3. Tensors 
-4. Logistic Regression
+4. Logistic Regression (Exercise 1)
 5. Deep Learning 
-6. Multi-Layer Perceptron
-7. Convolutional Neural Network 
-8. Recurrent Neural Network
+6. Multi-Layer Perceptron (Exercise 2)
+7. Convolutional Neural Network (Exercise 3)
+8. Recurrent Neural Network (Exercise 4)
 
 ---
 
@@ -458,7 +458,7 @@ Use the `multi-layer-perceptron.lua` script.
 Modify the script to do the following :
 
   1. take options from the command-line;
-  2. add Dropout or BatchNormalization between hidden layers;
+  2. add Dropout between hidden layers;
   3. write script to evaluate saved model on test set.
 
 Time : 10 min.
@@ -556,8 +556,8 @@ Convolutional Neural Network for the MNIST dataset :
 
 ```lua
 cnn = nn.Sequential()
-cnn:add(nn.Convert('bhwc', 'bchw')) -- cast input to same type as cnn
 -- 2 conv layers :
+cnn:add(nn.Convert())
 cnn:add(nn.SpatialConvolution(1, 16, 5, 5, 1, 1, 2, 2))
 cnn:add(nn.ReLU())
 cnn:add(nn.SpatialMaxPooling(2, 2, 2, 2))
@@ -596,6 +596,20 @@ nn.Sequential {
   (11): nn.LogSoftMax
 }
 ``` 
+
+---
+
+## Exercise 3 : Convolutional Neural Network
+
+Use the `convolutional-neural-network.lua` script.
+
+Modify the script to do the following :
+
+  1. add `[Spatial]BatchNormalization` between convolutions;
+  2. efficiently save model to disk (hint : use `nn.Serial` in `dpnn`);
+  3. handle variable number of convolution and hidden layers;
+  
+Time : 15 min.
 
 ---
 
@@ -736,6 +750,20 @@ Wrap into a `Sequencer` to handle one sequence per `forward` call:
 ```lua
 rnn = nn.Sequencer(rnn)
 ``` 
+
+---
+
+## Exercise 4 : Recurrent Language Model
+
+Use the `recurrent-language-model.lua` script.
+
+Modify the script to do the following :
+
+  1. use `LSTM` , `FastLSTM` or `GRU` instead of `Recurrence` (hint : `LookupTable` then `SplitTable`);
+  2. reach `150` perplexity on validation set (hint : `FastLSTM.usenngraph = true`);
+  3. use `evaluate-rnnlm.lua` to sample text from `mymodel.t7`.
+  
+Time : 15 min.
 
 ---
 
