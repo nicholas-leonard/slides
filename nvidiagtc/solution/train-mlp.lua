@@ -4,14 +4,18 @@ local dl = require 'dataload' -- provides MNIST
 require 'optim'
 
 -- options : hyper-parameters and such
-
-local opt = {
-   hiddensize = 200,
-   batchsize = 32,
-   maxepoch = 100,
-   learningrate = 0.1,
-   momentum = 0.9
-}
+cmd = torch.CmdLine() -- 1 take options from cmd-line
+cmd:text()
+cmd:text('Image Classification using Multi-Layer Perceptron (training)')
+cmd:text('Options:')
+cmd:option('-hiddensize', 200, 'number of hidden units')
+cmd:option('-nlayer', 2, 'number of hidden layers')
+cmd:option('-batchsize', 32, 'number of examples per batch')
+cmd:option('-maxepoch', 100, 'stop experiment after this many epochs')
+cmd:option('-learningrate', 0.1, 'SGD learning rate')
+cmd:option('-momentum', 0.9, 'SGD momemtum learning factor')
+cmd:option('-dropout', false, 'apply dropout on hidden neurons')
+local opt = cmd:parse(arg or {})
 
 -- data : MNIST
 local trainset, validset, testset = dl.loadMNIST()
@@ -20,18 +24,26 @@ local trainset, validset, testset = dl.loadMNIST()
 local mlp = nn.Sequential()
    :add(nn.Convert()) -- casts input to model type (float -> double)
    :add(nn.Collapse(3)) -- collapse 3D to 1D
-   :add(nn.Linear(1*28*28, opt.hiddensize))
-   :add(nn.Tanh())
-   :add(nn.Linear(opt.hiddensize, opt.hiddensize))
-   :add(nn.Tanh()) 
-   :add(nn.Linear(opt.hiddensize, 10))
-   :add(nn.LogSoftMax()) -- for classification problems
+
+local inputsize = 1*28*28
+for i=1,opt.nlayer do -- 4 number of hidden layers is a hyper-param
+   mlp:add(nn.Linear(inputsize, opt.hiddensize))
+   mlp:add(nn.Tanh())
+   if opt.dropout then -- 2 dropout goes after transfer function
+      mlp:add(nn.Dropout(0.5))
+   end
+   inputsize = opt.hiddensize
+end
+
+mlp:add(nn.Linear(inputsize, 10))
+mlp:add(nn.LogSoftMax()) -- for classification problems
 
 -- criterion : binary cross entropy
 local nll = nn.ClassNLLCriterion()
 
 -- training : stochastic gradient descent (SGD) with momentum learning
 local function trainEpoch(module, criterion, trainset)
+   module:training() -- 2 training mode (for dropout and batch norm)
    local sumloss = 0
    for i, input, target in trainset:sampleiter(opt.batchsize) do
       -- forward
@@ -52,6 +64,7 @@ end
 -- evaluation : cross-validation
 local cm = optim.ConfusionMatrix(10)
 function classEval(module, validset)
+   module:evaluate() -- 2 evaluate mode (for dropout and batch norm)
    cm:zero()
    for i, input, target in validset:subiter(opt.batchsize) do
       local output = module:forward(input)
@@ -83,11 +96,3 @@ for epoch=1,opt.maxepoch do
    end
    print""
 end
-
---[[
-Exercise 2 (10 min) : 
-  1. take options from the cmd-line (hint : torch.CmdLine())
-  2. option to use Dropout in hidden layers (hint : consult nn doc)
-  3. Bonus : write script to evaluate saved model on test set (hint : use classEval)
-  4. Bonus : make the number of hidden layers a hyper-parameter (hint : for loop)
---]]

@@ -200,9 +200,9 @@ Previous matrix-matrix multiply using CUDA :
 
 ```lua
 require 'cutorch'
-input = torch.CudaTensor(batchSize, inputSize):uniform(0,1)
-weight = torch.CudaTensor(outputSize, inputSize):uniform(0,1)
-output = torch.CudaTensor(batchSize, outputSize):zero()
+input = input:cuda() or torch.CudaTensor(batchSize, inputSize):uniform(0,1)
+weight = weight:cuda() or torch.CudaTensor(outputSize, inputSize):uniform(0,1)
+output = output:cuda() or torch.CudaTensor(batchSize, outputSize):zero()
 -- matrix matrix multiply :
 output:addmm(0, output, 1, input, weight:t())
 ```
@@ -308,9 +308,20 @@ Modify the script to do the following :
 
   1. Train for 100 epochs;
   2. Each call to `trainEpoch` prints the mean error of that epoch;
-  3. Use `Softmax` + `ClassNLLCriterion` instead of `Sigmoid` + `BCECriterion`.
+  3. Bonus : Use `Softmax` + `ClassNLLCriterion` instead of `Sigmoid` + `BCECriterion`.
+  
+Should output something like :
+
+```
+...
+Epoch 15 : mean loss = 0.731251	
+Epoch 16 : mean loss = 0.680807	
+...
+``` 
   
 Time : 10 min.
+
+Solution found in `solution/logistic-regression.lua`.
 
 ---
 
@@ -340,24 +351,24 @@ What is deep learning?
 
 .center[![](https://raw.githubusercontent.com/nicholas-leonard/slides/master/mnist.png)]
 
-__dp__ makes it easy to obtain the MNIST dataset :
+__dataload__ package makes it easy to obtain the MNIST dataset :
 
 ```lua
-require 'dp'
-ds = dp.Mnist()
+local dl = require 'dataload'
+local trainset, validset, testset = dl.loadMNIST()
 ``` 
 
-Training and validation sets :
+Each *batch* is a 4D `inputs` tensor  and a `targets` 1D tensor:
 
 ```lua
-trainInputs = ds:get('train', 'inputs', 'bchw')
-trainTargets = ds:get('train', 'targets', 'b')
+inputs, targets = trainset:sample(32)
+print(inputs:size(), targets:size())
+ 32 1 28 28
+[torch.LongStorage of size 4]
 
-validInputs = ds:get('valid', 'inputs', 'bchw')
-validTargets = ds:get('valid', 'targets', 'b')
+ 32
+[torch.LongStorage of size 1]
 ``` 
-
-*bchw* specifies axes order : `batch x channel x height x width`
 
 ---
 
@@ -386,7 +397,8 @@ An MLP with 2 layers of hidden units :
 
 ```lua
 module = nn.Sequential()
-module:add(nn.Convert('bchw', 'bf')) -- collapse 3D to 1D
+module:add(nn.Convert()) -- casts input to model type (float -> double)
+module:add(nn.Collapse(3)) -- collapse 3D to 1D
 module:add(nn.Linear(1*28*28, 200))
 module:add(nn.Tanh())
 module:add(nn.Linear(200, 200))
@@ -417,7 +429,7 @@ function classEval(module, inputs, targets)
       cm:add(output, target)
    end
    cm:updateValids()
-   return cm.totalValids
+   return cm.totalValid
 end
 ``` 
 
@@ -459,9 +471,18 @@ Modify the script to do the following :
 
   1. take options from the command-line;
   2. add Dropout between hidden layers;
-  3. write script to evaluate saved model on test set.
+  3. Bonus : write script to evaluate saved model on test set;
+  4. Bonus : make the number of hidden layers a hyper-parameter.
 
 Time : 10 min.
+
+Evaluation script should output something like :
+```
+th evaluate-mlp.lua 
+Test accuracy=0.977000
+``` 
+
+Solution found in `solution/[train|evaluate]-mlp.lua`. 
 
 ---
 
