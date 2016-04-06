@@ -8,9 +8,7 @@ Remote Desktop Software: Download NoMachine now for best performance from [www.n
 
  * Alternatively you may use a VNC client or the provided browser-based VNC option
 
----
-
-# CONNECTION INSTRUCTIONS
+## CONNECTION INSTRUCTIONS
 
  1. Navigate to [nvlabs.qwiklab.com](nvlabs.qwiklab.com)
  2. Login or create a new account
@@ -33,7 +31,7 @@ https://github.com/nicholas-leonard
 
 Element Inc.
 
-April , 2016
+April 6, 2016
 
 ---
 
@@ -117,22 +115,13 @@ What's up with Torch 7?
   * under development since October 2002 ;
   * used by Facebook, Google [DeepMind], Twitter, NYU, ... ;
   * documentation, tutorials, demos, examples ;
-  
-Active open-source community : 
-
-  * https://github.com/karpathy/char-rnn : character-level language models;
-  * https://github.com/skaae/torch-gan : generative adversarial networks for face generations;
-  * https://github.com/cmusatyalab/openface : face recognition with deep neural nets;
-  * https://github.com/facebook/fb.resnet.torch : deep residual networks (Facebook);
-  * https://github.com/twitter/torch-autograd : automatic gradient differentiation (Twitter);
-  * https://github.com/deepmind/torch-hdf5 : torch interface to HDF5 library (Deep Mind)
 
 
 ---
 
 ## Introduction - Useful Links
 
-Main : torch.ch
+Main : http://torch.ch/
 
 Cheatsheet: https://github.com/torch/torch7/wiki/Cheatsheet
 
