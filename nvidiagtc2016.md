@@ -115,7 +115,6 @@ What's up with Torch 7?
   * used by Facebook, Google [DeepMind], Twitter, NYU, ... ;
   * documentation, tutorials, demos, examples ;
 
-
 ---
 
 ## Introduction - Useful Links
@@ -137,7 +136,8 @@ Advanced only: https://gitter.im/torch/torch7
 The Torch 7 distribution is made up of different packages, each its own github repository :
 
  * __torch7__/__cutorch__ : tensors, BLAS, file I/O (serialization), OOP, unit testing and cmd-line argument parsing ;
- * __nn__/__cunn__ : easy and modular way to build and train simple or complex neural networks using `modules` and `criterions` ;
+ * __nn__/__cunn__ : easy and modular way to build and train neural networks using `modules` and `criterions` ;
+ * __nngraph__ : nn with support for more complicated graphs ;
  * __optim__ : optimization package for nn. Provides training algorithms like SGD, LBFGS, etc. Uses closures ;
  * __trepl__ : torch read–eval–print loop, Lua interpreter, `th>` ;
  * __paths__ : file system manipulation package ;
@@ -154,7 +154,6 @@ Many more unofficial packages out there :
  * __dpnn__ : extensions to the nn library. ;
  * __rnn__ : recurrent neural network library. Implements RNN, GRU, LSTM, BRNN, and RAM ;
  * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
- * __dp__ : deep learning library for cross-validation (early-stopping) ;
  * __dataload__ : library for loading and iterating through datasets ;
  * __moses__ : utility-belt library for functional programming in Lua, mostly for tables ;
  * __threads__/__parallel__ : libraries for multi-threading or multi-processing ;
@@ -347,7 +346,8 @@ Modify the `logistic-regression.lua` script to do the following :
   
 Should output something like :
 
-```
+```bash
+$ th logistic-regression.lua
 ...
 Epoch 99 : mean loss = 0.038046	
 Epoch 100 : mean loss = 0.036116	
@@ -692,9 +692,10 @@ Modify the script to do the following :
   3. Bonus : efficiently save model to disk using `Serial`.
   
 Try the `-cuda` flag.
+
 Evaluate with `th solution/evaluate-mlp.lua -modelpath '/home/ubuntu/save/cnn.t7'`.
   
-Time : 15 min.
+Time : 10 min.
 
 Solution found in `solution/convolution-neural-network.lua`. 
 
@@ -702,9 +703,9 @@ Solution found in `solution/convolution-neural-network.lua`.
 
 ## Exercise 3 : Take-away points
 
-CNN can get a `4-10x` speedup using NVIDIA GPUs;
+CNNs have better performance than MLPs for images;
 
-Convolutions have few parameters but many units;
+We can get a `4-10x` speedup using NVIDIA GPUs;
 
 `Serial` doesn't save `output` and `gradInput` to disk : 1.5 vs 9 MB;
 
@@ -776,14 +777,14 @@ trainset, validset, testset = dl.loadPTB{batchsize,1,1}
 Batch of 3 sample sequences of length 5:
 ```lua
 print(inputs:t(), targets:t())
-   36  1516   853    94  1376
- 3193   433   553   805   521
-  512   434    57  1029  1962
+  238   808   951  1326  1477
+ 8311  7671  4749    49  2308
+ 3660  9800  4765  5375  6018
 [torch.IntTensor of size 3x5]
 
-   36  1516   853    94  1376
- 3193   433   553   805   521
-  512   434    57  1029  1962
+  808   951  1326  1477  1692
+ 7671  4749    49  2308  9120
+ 9800  4765  5375  6018  7523
 [torch.IntTensor of size 3x5]
 ``` 
 
@@ -826,7 +827,7 @@ rnn = nn.Sequencer(rnn)
 Modify the `recurrent-language-model.lua` script to do the following :
 
   1. use `LSTM` , `FastLSTM` or `GRU` instead of `Recurrence`;
-  2. reach `150` perplexity (PPL) on validation set;
+  2. train to reach `150` perplexity (PPL) on validation set;
   3. use `evaluate-rnnlm.lua` to sample text from saved models.
 
 ```
@@ -852,13 +853,21 @@ Solutions in `solution/train-rnnlm.lua`.
 
 ## Exercise 4 : Take-away points
 
-LSTM and GRU can learn longer sequences than RNNs;
+LSTM and GRU can learn longer sequences (`seqlen`) than RNNs;
 
 Stacking LSTM/GRU/RNNs can give even better results;
 
 Optimizing hyper-parameters is a process of trial and error that takes time;
 
-Language models can be used to generate text...
+Using a learning rate schedule can help :
+
+```lua
+th recurrent-language-model.lua -progress -cuda -lstm -seqlen 20 -hiddensize '{200,200}' 
+-batchsize 20 -startlr 1 -cutoff 5 -maxepoch 13 
+-schedule '{[5]=0.5,[6]=0.25,[7]=0.125,[8]=0.0625,[9]=0.03125,[10]=0.015625,[11]=0.0078125,[12]=0.00390625}'
+``` 
+
+Evaluation loops through one continous sequence;
 
 ---
 

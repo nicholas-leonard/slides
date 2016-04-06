@@ -159,7 +159,7 @@ for epoch=1,opt.maxepoch do
 end
 
 --[[ 
-Exercise 3 (15 min) :
+Exercise 3 (10 min) :
 Modify the script to do the following :
   1. add SpatialMaxPooling to convolution layers (hint : use opt.poolsize and opt.poolstride);
   2. add [Spatial]BatchNormalization to convolution and hidden layers (hint : consult nn doc);
