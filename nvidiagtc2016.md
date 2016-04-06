@@ -340,9 +340,7 @@ end
 
 ## Exercise 1 : Logistic Regression
 
-Use the `logistic-regression.lua` script.
-
-Modify the script to do the following :
+Modify the `logistic-regression.lua` script to do the following :
 
   1. Train for 100 epochs;
   2. Each call to `trainEpoch` prints the mean error of that epoch;
@@ -352,14 +350,28 @@ Should output something like :
 
 ```
 ...
-Epoch 15 : mean loss = 0.731251	
-Epoch 16 : mean loss = 0.680807	
-...
+Epoch 99 : mean loss = 0.038046	
+Epoch 100 : mean loss = 0.036116	
 ``` 
   
 Time : 10 min.
 
 Solution found in `solution/logistic-regression.lua`.
+
+---
+
+## Exercise 1 : Take-away points
+
+
+Like Python, Lua is relatively easy to use;
+
+Stochastic Gradient Descent is simple: 
+ * forward, backward, update;
+ * error is minimized after multiple iterations through data;
+ 
+Can use BCE or NLL to minimize error of binary classification problems;
+
+Logistic regression models are very simple models.
 
 ---
 
@@ -503,12 +515,10 @@ Early-stops when no new maxima has been found for 30 consecutive epochs.
 
 ## Exercise 2 : Multi-Layer Perceptron
 
-Use the `multi-layer-perceptron.lua` script.
-
-Modify the script to do the following :
+Modify the `multi-layer-perceptron.lua` script to do the following :
 
   1. take options from the command-line;
-  2. add Dropout between hidden layers;
+  2. add `Dropout` between hidden layers;
   3. Bonus : write script to evaluate saved model on test set;
   4. Bonus : make the number of hidden layers a hyper-parameter.
 
@@ -521,6 +531,20 @@ Test accuracy=0.977000
 ``` 
 
 Solution found in `solution/[train|evaluate]-mlp.lua`. 
+
+---
+
+## Exercise 2 : Take-away points
+
+Easier to try different hyper-parameters (options) from the cmd-line;
+
+Dropout can help with generalization, but increases convergence time;
+
+Experimentation usually requires two scripts and 3 datasets :
+ * training : optimize model on *training set*, early-stop on *validation set*;
+ * evaluation : measure performance on *test set*;
+ 
+Deeper models (more layers) can help with generalization.
 
 ---
 
@@ -679,10 +703,15 @@ Solution found in `solution/convolution-neural-network.lua`.
 
 ## Exercise 3 : Take-away points
 
- * CNN can get a `4-10x` speedup using NVIDIA Titan Black GPU;
- * `Serial` doesn't save `output` and `gradInput` to disk : 1.5 vs 9 MB;
- * batch normalization can help with convergence and generalization ;
- * max pooling reduces the width/height of `output` Tensors.
+CNN can get a `4-10x` speedup using NVIDIA GPUs;
+
+Convolutions have few parameters but many units;
+
+`Serial` doesn't save `output` and `gradInput` to disk : 1.5 vs 9 MB;
+
+Batch normalization can help with convergence and generalization;
+
+Pooling reduces the width/height of representations.
 
 ---
 
@@ -780,7 +809,7 @@ Wrap into a `Recurrence` module and add an output layer:
 
 ```lua
 rnn = nn.Sequential()
-   :add(nn.Recurrence(rm, hiddenSize, 0)) 
+   :add(nn.Recurrence(rm, 200, 0)) 
    :add(nn.Linear(200, 10000)) -- output layer (W)
    :add(nn.LogSoftMax())
 ``` 
@@ -795,9 +824,7 @@ rnn = nn.Sequencer(rnn)
 
 ## Exercise 4 : Recurrent Language Model
 
-Use the `recurrent-language-model.lua` script.
-
-Modify the script to do the following :
+Modify the `recurrent-language-model.lua` script to do the following :
 
   1. use `LSTM` , `FastLSTM` or `GRU` instead of `Recurrence` (hint : `LookupTable` then `SplitTable`);
   2. reach `150` perplexity (PPL) on validation set (hint : `FastLSTM.usenngraph = true`);
@@ -818,7 +845,7 @@ nn.Serial @ nn.Sequential {
 }
 ``` 
   
-Time : 15 min.
+Time : 15 min; 
 
 Solutions in `solution/train-rnnlm.lua`.
 
@@ -826,11 +853,17 @@ Solutions in `solution/train-rnnlm.lua`.
 
 ## Exercise 4 : Take-away points
 
- * 
+LSTM and GRU can learn longer sequences than RNNs;
+
+Stacking LSTM/GRU/RNNs can give even better results;
+
+Optimizing hyper-parameters is a process of trial and error that takes time;
+
+Language models can be used to generate text...
 
 ---
 
-## Exercise 4 : Take-away points
+## Exercise 4 : Generating text
 
 Generating text using a model with 116 test PPL :
 

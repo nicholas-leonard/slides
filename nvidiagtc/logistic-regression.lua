@@ -3,7 +3,7 @@ require 'dpnn' -- provides nn.Module:updateGradParameters(momentum)
 
 -- data : dummy data
 inputs = torch.Tensor(100,2):uniform(-1,1)
-targets = torch.gt(inputs:select(2,1) + inputs:select(2,2) , 0) + 1 -- class 1 if sum of inputs <= 0, class 2 otherwise
+targets = torch.Tensor():gt(inputs:select(2,1) + inputs:select(2,2) , 0) + 1 -- class 1 if sum of inputs <= 0, class 2 otherwise
 
 -- model : logistic regressor
 local logreg = nn.Sequential()
