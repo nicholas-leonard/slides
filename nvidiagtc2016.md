@@ -1,19 +1,18 @@
-# SOFTWARE FOR LAB
+# Lab Setup
 
-SSH Access Software (recommended): PuTTy for Windows can be downloaded from [www.putty.org](www.putty.org)
+SSH or Remote Desktop clients:
 
- * Alternatively you may use a provided browser-based SSH option
+ * SSH Access Software (recommended): PuTTy for Windows can be downloaded from [www.putty.org](www.putty.org)
+   * Alternatively you may use a provided browser-based SSH option
+ * Remote Desktop Software: Download NoMachine now for best performance from [www.nomachine.com/download](www.nomachine.com/download)
+   * Alternatively you may use a VNC client or the provided browser-based VNC option
 
-Remote Desktop Software: Download NoMachine now for best performance from [www.nomachine.com/download](www.nomachine.com/download)
+Connection Instructions :
 
- * Alternatively you may use a VNC client or the provided browser-based VNC option
-
-## CONNECTION INSTRUCTIONS
-
- 1. Navigate to [nvlabs.qwiklab.com](nvlabs.qwiklab.com)
- 2. Login or create a new account
- 3. Select the “Instructor-Led Hands-on Labs” Class
- 4. Find the lab called “Applied Deep Learning for Vision and Natural Language with Torch7”
+ 1. Navigate to [nvlabs.qwiklab.com](nvlabs.qwiklab.com);
+ 2. Login or create a new account;
+ 3. Select the *Instructor-Led Hands-on Labs* Class;
+ 4. Find the lab called *Applied Deep Learning for Vision and Natural Language with Torch7*;
    * select it, click Select, and finally click Start
  5. After a short wait, lab instance Connection information will be shown
 
