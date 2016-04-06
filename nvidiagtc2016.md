@@ -825,9 +825,9 @@ rnn = nn.Sequencer(rnn)
 
 Modify the `recurrent-language-model.lua` script to do the following :
 
-  1. use `LSTM` , `FastLSTM` or `GRU` instead of `Recurrence` (hint : `LookupTable` then `SplitTable`);
-  2. reach `150` perplexity (PPL) on validation set (hint : `FastLSTM.usenngraph = true`);
-  3. use `evaluate-rnnlm.lua` to sample text from `mymodel.t7`.
+  1. use `LSTM` , `FastLSTM` or `GRU` instead of `Recurrence`;
+  2. reach `150` perplexity (PPL) on validation set;
+  3. use `evaluate-rnnlm.lua` to sample text from saved models.
 
 ```
 nn.Serial @ nn.Sequential {

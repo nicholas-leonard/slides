@@ -276,5 +276,5 @@ print("th evaluate-rnnlm.lua --xplogpath "..paths.concat(opt.savepath, opt.id..'
 Modify the script to do the following :
   1. use `FastLSTM` or `GRU` instead of `Recurrence` (hint : see rnn doc);
   2. reach `150` perplexity (PPL) on validation set (hint : line 10 );
-  3. use `evaluate-rnnlm.lua` to sample text from `mymodel.t7`.
+  3. use `evaluate-rnnlm.lua` to sample text from your saved model (hint : use -nsample).
 --]]
