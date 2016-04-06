@@ -68,7 +68,7 @@ opt.bestAccuracy, opt.bestEpoch = 0, 0
 local wait = 0
 for epoch=1,opt.maxepoch do
    local trainloss = trainEpoch(mlp, nll, trainset)
-   print(string.format("Epoch #%d : mean loss=%f", epoch, trainloss))
+   print(string.format("Epoch #%d : mean training loss=%f", epoch, trainloss))
    local validAccuracy = classEval(mlp, validset)
    print(string.format("Validation accuracy=%f", validAccuracy))
    if validAccuracy > opt.bestAccuracy then

@@ -2,44 +2,41 @@ require 'paths'
 require 'rnn'
 local dl = require 'dataload'
 
-version = 2
-
 --[[ command line arguments ]]--
 cmd = torch.CmdLine()
 cmd:text()
 cmd:text('Train a Language Model on PennTreeBank dataset using RNN or LSTM or GRU')
 cmd:text('Example:')
-cmd:text('th recurrent-language-model.lua --cuda --device 2 --progress --cutoff 4 --seqlen 10')
-cmd:text("th recurrent-language-model.lua --progress --cuda --lstm --seqlen 20 --hiddensize '{200,200}' --batchsize 20 --startlr 1 --cutoff 5 --maxepoch 13 --schedule '{[5]=0.5,[6]=0.25,[7]=0.125,[8]=0.0625,[9]=0.03125,[10]=0.015625,[11]=0.0078125,[12]=0.00390625}'")
+cmd:text("th recurrent-language-model.lua -progress -cuda -lstm -seqlen 20 -hiddensize '{200,200}' -batchsize 20 -startlr 1 -cutoff 5 -maxepoch 13 -schedule '{[5]=0.5,[6]=0.25,[7]=0.125,[8]=0.0625,[9]=0.03125,[10]=0.015625,[11]=0.0078125,[12]=0.00390625}'")
 cmd:text('Options:')
 -- training
-cmd:option('--startlr', 0.05, 'learning rate at t=0')
-cmd:option('--minlr', 0.00001, 'minimum learning rate')
-cmd:option('--saturate', 400, 'epoch at which linear decayed LR will reach minlr')
-cmd:option('--schedule', '', 'learning rate schedule. e.g. {[5] = 0.004, [6] = 0.001}')
-cmd:option('--momentum', 0.9, 'momentum')
-cmd:option('--maxnormout', -1, 'max l2-norm of each layer\'s output neuron weights')
-cmd:option('--cutoff', -1, 'max l2-norm of concatenation of all gradParam tensors')
-cmd:option('--batchSize', 32, 'number of examples per batch')
-cmd:option('--cuda', false, 'use CUDA')
-cmd:option('--device', 1, 'sets the device (GPU) to use')
-cmd:option('--maxepoch', 1000, 'maximum number of epochs to run')
-cmd:option('--earlystop', 50, 'maximum number of epochs to wait to find a better local minima for early-stopping')
-cmd:option('--progress', false, 'print progress bar')
-cmd:option('--silent', false, 'don\'t print anything to stdout')
-cmd:option('--uniform', 0.1, 'initialize parameters using uniform distribution between -uniform and uniform. -1 means default initialization')
+cmd:option('-startlr', 0.05, 'learning rate at t=0')
+cmd:option('-minlr', 0.00001, 'minimum learning rate')
+cmd:option('-saturate', 400, 'epoch at which linear decayed LR will reach minlr')
+cmd:option('-schedule', '', 'learning rate schedule. e.g. {[5] = 0.004, [6] = 0.001}')
+cmd:option('-momentum', 0.9, 'momentum')
+cmd:option('-maxnormout', -1, 'max l2-norm of each layer\'s output neuron weights')
+cmd:option('-cutoff', -1, 'max l2-norm of concatenation of all gradParam tensors')
+cmd:option('-batchSize', 32, 'number of examples per batch')
+cmd:option('-cuda', false, 'use CUDA')
+cmd:option('-device', 1, 'sets the device (GPU) to use')
+cmd:option('-maxepoch', 1000, 'maximum number of epochs to run')
+cmd:option('-earlystop', 50, 'maximum number of epochs to wait to find a better local minima for early-stopping')
+cmd:option('-progress', false, 'print progress bar')
+cmd:option('-silent', false, 'don\'t print anything to stdout')
+cmd:option('-uniform', 0.1, 'initialize parameters using uniform distribution between -uniform and uniform. -1 means default initialization')
 -- rnn layer 
-cmd:option('--lstm', false, 'use Long Short Term Memory (nn.LSTM instead of nn.Recurrent)')
-cmd:option('--gru', false, 'use Gated Recurrent Units (nn.GRU instead of nn.Recurrent)')
-cmd:option('--seqlen', 5, 'sequence length : back-propagate through time (BPTT) for this many time-steps')
-cmd:option('--hiddensize', '{200}', 'number of hidden units used at output of each recurrent layer. When more than one is specified, RNN/LSTMs/GRUs are stacked')
-cmd:option('--dropout', 0, 'apply dropout with this probability after each rnn layer. dropout <= 0 disables it.')
+cmd:option('-lstm', false, 'use Long Short Term Memory (nn.LSTM instead of nn.Recurrent)')
+cmd:option('-gru', false, 'use Gated Recurrent Units (nn.GRU instead of nn.Recurrent)')
+cmd:option('-seqlen', 5, 'sequence length : back-propagate through time (BPTT) for this many time-steps')
+cmd:option('-hiddensize', '{200}', 'number of hidden units used at output of each recurrent layer. When more than one is specified, RNN/LSTMs/GRUs are stacked')
+cmd:option('-dropout', 0, 'apply dropout with this probability after each rnn layer. dropout <= 0 disables it.')
 -- data
-cmd:option('--batchsize', 32, 'number of examples per batch')
-cmd:option('--trainsize', -1, 'number of train examples seen between each epoch')
-cmd:option('--validsize', -1, 'number of valid examples used for early stopping and cross-validation') 
-cmd:option('--savepath', paths.concat(dl.SAVE_PATH, 'rnnlm'), 'path to directory where experiment log (includes model) will be saved')
-cmd:option('--id', '', 'id string of this experiment (used to name output file) (defaults to a unique id)')
+cmd:option('-batchsize', 32, 'number of examples per batch')
+cmd:option('-trainsize', -1, 'number of train examples seen between each epoch')
+cmd:option('-validsize', -1, 'number of valid examples used for early stopping and cross-validation') 
+cmd:option('-savepath', paths.concat(dl.SAVE_PATH, 'rnnlm'), 'path to directory where experiment log (includes model) will be saved')
+cmd:option('-id', '', 'id string of this experiment (used to name output file) (defaults to a unique id)')
 
 cmd:text()
 local opt = cmd:parse(arg or {})
@@ -79,11 +76,9 @@ for i,hiddensize in ipairs(opt.hiddensize) do
    local rnn
    
    if opt.gru then -- Gated Recurrent Units
-      rnn = nn.GRU(inputsize, hiddensize, nil, opt.dropout/2)
+      -- INSERT GRU HERE
    elseif opt.lstm then -- Long Short Term Memory units
-      require 'nngraph'
-      nn.FastLSTM.usenngraph = true -- faster
-      rnn = nn.FastLSTM(inputsize, hiddensize)
+      -- INSERT FASTLSTM HERE
    else -- simple recurrent neural network
       local rm =  nn.Sequential() -- input is {x[t], h[t-1]}
          :add(nn.ParallelTable()
@@ -155,7 +150,7 @@ local xplog = {}
 xplog.opt = opt -- save all hyper-parameters and such
 xplog.dataset = 'PennTreeBank'
 xplog.vocab = trainset.vocab
--- will only serialize params
+-- will only serialize params/gradParams
 xplog.model = nn.Serial(lm)
 xplog.model:mediumSerial()
 --xplog.model = lm
@@ -275,4 +270,11 @@ while opt.maxepoch <= 0 or epoch <= opt.maxepoch do
    epoch = epoch + 1
 end
 print("Evaluate model using : ")
-print("th scripts/evaluate-rnnlm.lua --xplogpath "..paths.concat(opt.savepath, opt.id..'.t7')..(opt.cuda and '--cuda' or ''))
+print("th evaluate-rnnlm.lua --xplogpath "..paths.concat(opt.savepath, opt.id..'.t7')..(opt.cuda and '-cuda' or ''))
+
+--[[
+Modify the script to do the following :
+  1. use `FastLSTM` or `GRU` instead of `Recurrence` (hint : see rnn doc);
+  2. reach `150` perplexity (PPL) on validation set (hint : line 10 );
+  3. use `evaluate-rnnlm.lua` to sample text from `mymodel.t7`.
+--]]

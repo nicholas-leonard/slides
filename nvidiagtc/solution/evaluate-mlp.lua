@@ -2,6 +2,7 @@ require 'nn'
 require 'dpnn' 
 local dl = require 'dataload' -- provides MNIST
 require 'optim'
+pcall(function() require 'cunn' end)
 
 -- options : hyper-parameters and such
 cmd = torch.CmdLine() -- 1 take options from cmd-line
@@ -19,10 +20,10 @@ local mlp = torch.load(opt.modelpath)
 
 -- test set evaluation
 local cm = optim.ConfusionMatrix(10) 
-function classEval(module, validset) -- same as in train-mlp.lua
+function classEval(module, set) -- same as in train-mlp.lua
    module:evaluate()
    cm:zero()
-   for i, input, target in validset:subiter(opt.batchsize) do
+   for i, input, target in set:subiter(opt.batchsize) do
       local output = module:forward(input)
       cm:batchAdd(output, target)
    end
@@ -31,4 +32,5 @@ function classEval(module, validset) -- same as in train-mlp.lua
 end
 
 local testAccuracy = classEval(mlp, testset)
+print(cm)
 print(string.format("Test accuracy=%f", testAccuracy))

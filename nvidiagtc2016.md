@@ -1,3 +1,28 @@
+# SOFTWARE FOR LAB
+
+SSH Access Software (recommended): PuTTy for Windows can be downloaded from [www.putty.org](www.putty.org)
+
+ * Alternatively you may use a provided browser-based SSH option
+
+Remote Desktop Software: Download NoMachine now for best performance from [www.nomachine.com/download](www.nomachine.com/download)
+
+ * Alternatively you may use a VNC client or the provided browser-based VNC option
+
+---
+
+# CONNECTION INSTRUCTIONS
+
+ 1. Navigate to [nvlabs.qwiklab.com](nvlabs.qwiklab.com)
+ 2. Login or create a new account
+ 3. Select the “Instructor-Led Hands-on Labs” Class
+ 4. Find the lab called “Applied Deep Learning for Vision and Natural Language with Torch7”
+   * select it, click Select, and finally click Start
+ 5. After a short wait, lab instance Connection information will be shown
+
+Please ask Lab Assistants for help!
+
+---
+
 class: center, middle
 
 # Torch 7: Applied Deep Learning for Vision and Natural Language
@@ -92,7 +117,30 @@ What's up with Torch 7?
   * under development since October 2002 ;
   * used by Facebook, Google [DeepMind], Twitter, NYU, ... ;
   * documentation, tutorials, demos, examples ;
+  
+Active open-source community : 
 
+  * https://github.com/karpathy/char-rnn : character-level language models;
+  * https://github.com/skaae/torch-gan : generative adversarial networks for face generations;
+  * https://github.com/cmusatyalab/openface : face recognition with deep neural nets;
+  * https://github.com/facebook/fb.resnet.torch : deep residual networks (Facebook);
+  * https://github.com/twitter/torch-autograd : automatic gradient differentiation (Twitter);
+  * https://github.com/deepmind/torch-hdf5 : torch interface to HDF5 library (Deep Mind)
+
+
+---
+
+## Introduction - Useful Links
+
+Main : torch.ch
+
+Cheatsheet: https://github.com/torch/torch7/wiki/Cheatsheet
+
+Github: https://github.com/torch/torch7
+
+Google Group for new users and installation queries: https://groups.google.com/forum/embed/?place=forum%2Ftorch7#!forum/torch7
+
+Advanced only: https://gitter.im/torch/torch7
 
 ---
 
@@ -119,12 +167,13 @@ Many more unofficial packages out there :
  * __rnn__ : recurrent neural network library. Implements RNN, GRU, LSTM, BRNN, and RAM ;
  * __nnx__/__cunnx__ : experimental neural network modules and criterions : `SpatialReSampling`, `SoftMaxTree`, etc. ;
  * __dp__ : deep learning library for cross-validation (early-stopping) ;
+ * __dataload__ : library for loading and iterating through datasets ;
  * __moses__ : utility-belt library for functional programming in Lua, mostly for tables ;
  * __threads__/__parallel__ : libraries for multi-threading or multi-processing ;
 
 ---
 
-## Tensors 
+# Tensors 
 
 Tensors are the main class of objects used in Torch 7 :
 
@@ -622,48 +671,29 @@ nn.Sequential {
 
 ## Exercise 3 : Convolutional Neural Network
 
-Use the `convolutional-neural-network.lua` script.
+Use the `convolution-neural-network.lua` script.
 
 Modify the script to do the following :
 
-  1. add `[Spatial]BatchNormalization` between convolutions;
-  2. efficiently save model to disk (hint : use `nn.Serial` in `dpnn`);
-  3. handle variable number of convolution and hidden layers;
+  1. add `SpatialMaxPooling` to convolution layers;
+  2. add `[Spatial]BatchNormalization` to convolution and hidden layers ;
+  3. Bonus : efficiently save model to disk using `Serial`.
+  
+Try the `-cuda` flag.
+Evaluate with `th solution/evaluate-mlp.lua -modelpath '/home/ubuntu/save/cnn.t7'`.
   
 Time : 15 min.
 
+Solution found in `solution/convolution-neural-network.lua`. 
+
 ---
 
-## Convolutional Neural Network - Training
+## Exercise 3 : Take-away points
 
-Example output when training `cnn:cuda()` with __dp__ :
-
-```lua
-==> epoch # 1 for optimizer :
- [================= 50000/50000 ================>] ETA: 0ms | Step: 0ms          
-==> example speed = 3307.5264556521 examples/s  
-rhea:1444146704:1:optimizer:loss avgErr 0.0071848043689877
-rhea:1444146704:1:optimizer:confusion accuracy = 0.92722
-rhea:1444146704:1:validator:confusion accuracy = 0.9749 
-rhea:1444146704:1:tester:confusion accuracy = 0.9791
-==> epoch # 2 for optimizer :   
- [================= 50000/50000 ================>] ETA: 0ms | Step: 0ms          
-==> example speed = 3324.6636764618 examples/s  
-rhea:1444146704:1:optimizer:loss avgErr 0.0020881871616095
-rhea:1444146704:1:optimizer:confusion accuracy = 0.97956
-rhea:1444146704:1:validator:confusion accuracy = 0.9794 
-rhea:1444146704:1:tester:confusion accuracy = 0.9831
-==> epoch # 3 for optimizer :   
-...
-``` 
-
-Without CUDA, i.e. using CPU instead of GPU :
-
-```lua     
-==> example speed = 328.75346894227 examples/s    
-```
-
-`10x` speedup using NVIDIA Titan Black GPU.
+ * CNN can get a `4-10x` speedup using NVIDIA Titan Black GPU;
+ * `Serial` doesn't save `output` and `gradInput` to disk : 1.5 vs 9 MB;
+ * batch normalization can help with convergence and generalization ;
+ * max pooling reduces the width/height of `output` Tensors.
 
 ---
 
@@ -720,23 +750,23 @@ Penn Tree Bank dataset :
  * 10000 word vocabulary ;
  * approx. 1 million words of text ;
 
-Use __dp__ to get Penn Tree Bank dataset :
+Use __dataload__ to get Penn Tree Bank dataset :
 
 ```lua
-ds = dp.PennTreeBank{recurrent=true, context_size=5}
-trainSet = ds:trainSet()
+trainset, validset, testset = dl.loadPTB{batchsize,1,1}
 ``` 
 
-Batch of 3 sample sequences of `inputs` and `targets` :
+Batch of 3 sample sequences of length 5:
 ```lua
+print(inputs:t(), targets:t())
    36  1516   853    94  1376
  3193   433   553   805   521
   512   434    57  1029  1962
 [torch.IntTensor of size 3x5]
-                           
- 1516   853    94  1376   719
-  433   553   805   521    27
-  434    57  1029  1962    49
+
+   36  1516   853    94  1376
+ 3193   433   553   805   521
+  512   434    57  1029  1962
 [torch.IntTensor of size 3x5]
 ``` 
 
@@ -781,10 +811,60 @@ Use the `recurrent-language-model.lua` script.
 Modify the script to do the following :
 
   1. use `LSTM` , `FastLSTM` or `GRU` instead of `Recurrence` (hint : `LookupTable` then `SplitTable`);
-  2. reach `150` perplexity on validation set (hint : `FastLSTM.usenngraph = true`);
+  2. reach `150` perplexity (PPL) on validation set (hint : `FastLSTM.usenngraph = true`);
   3. use `evaluate-rnnlm.lua` to sample text from `mymodel.t7`.
+
+```
+nn.Serial @ nn.Sequential {
+  [input -> (1) -> (2) -> (3) -> output]
+  (1): nn.LookupTable
+  (2): nn.SplitTable
+  (3): nn.Sequencer @ nn.Recursor @ nn.Sequential {
+    [input -> (1) -> (2) -> (3) -> (4) -> output]
+    (1): nn.FastLSTM(200 -> 200)
+    (2): nn.FastLSTM(200 -> 200)
+    (3): nn.Linear(200 -> 10000)
+    (4): nn.LogSoftMax
+  }
+}
+``` 
   
 Time : 15 min.
+
+Solutions in `solution/train-rnnlm.lua`.
+
+---
+
+## Exercise 4 : Take-away points
+
+ * 
+
+---
+
+## Exercise 4 : Take-away points
+
+Generating text using a model with 116 test PPL :
+
+```lua
+th evaluate-rnnlm.lua -xplogpath /home/ubuntu/save/rnnlm/rnnlm200x200.t7 -nsample 200
+``` 
+
+will result in someting like this :
+
+```
+mr. jones contends that in his first popularity the organizations are 
+almost <unk> by their side <eos> it is particularly almost he adds <eos> 
+but it 's also a <unk> unsuccessfully <eos> i felt somebody wanted 
+westridge and financial commercial steelmakers <eos> an oct. 
+N bankruptcy-law article is comment <eos> <unk> <unk> <eos> there 's no 
+signs of internal mergers and companies involved in the life of light 
+insider business <eos> michael <unk> several years old and the mr. 
+buffett as a former abortions in the senate to abortion-rights its mind 
+is mr. straszheim 's remarks with a career replacement works <eos> <unk> 
+education was named a director of this plastics media <eos> 
+```
+
+Not bad for 1h of training!
 
 ---
 
